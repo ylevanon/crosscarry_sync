@@ -1,7 +1,8 @@
-import { Stack } from 'expo-router';
-import React, { useMemo } from 'react';
-import { useSystem } from '../library/powersync/system';
-import { PowerSyncContext } from '@powersync/react-native';
+import { PowerSyncContext } from "@powersync/react-native";
+import { Stack } from "expo-router";
+import React, { useMemo } from "react";
+
+import { useSystem } from "../library/powersync/system";
 
 /**
  * This App uses a nested navigation stack.
@@ -24,9 +25,14 @@ const HomeLayout = () => {
   }, []);
   return (
     <PowerSyncContext.Provider value={db}>
-      <Stack screenOptions={{ headerTintColor: '#fff', headerStyle: { backgroundColor: '#2196f3' } }}>
-        <Stack.Screen name="signin" options={{ title: 'Supabase Login' }} />
-        <Stack.Screen name="register" options={{ title: 'Register' }} />
+      <Stack
+        screenOptions={{
+          headerTintColor: "#fff",
+          headerStyle: { backgroundColor: "#2196f3" },
+        }}
+      >
+        <Stack.Screen name="signin" options={{ title: "Supabase Login" }} />
+        <Stack.Screen name="register" options={{ title: "Register" }} />
 
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="views" options={{ headerShown: false }} />
