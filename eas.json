@@ -1,20 +1,25 @@
 {
   "cli": {
-    "version": ">= 3.13.3",
-    "promptToConfigurePushNotifications": false
+    "version": ">= 10.2.4"
   },
   "build": {
-    "development": {
+    "development:simulator": {
       "developmentClient": true,
       "distribution": "internal",
-      "channel": "preview"
+      "ios": {
+        "simulator": true
+      }
     },
-    "preview": {
-      "channel": "preview",
+    "development": {
+      "developmentClient": true,
       "distribution": "internal"
     },
-    "production": {
-      "channel": "production"
-    }
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {}
+  },
+  "submit": {
+    "production": {}
   }
 }
