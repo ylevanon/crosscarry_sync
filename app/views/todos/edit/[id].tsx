@@ -1,13 +1,14 @@
+import { Ionicons } from '@expo/vector-icons';
 import { ATTACHMENT_TABLE, AttachmentRecord } from '@powersync/attachments';
 import { usePowerSync, useQuery } from '@powersync/react-native';
 import { CameraCapturedPicture } from 'expo-camera';
+import { Stack, useLocalSearchParams } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import _ from 'lodash';
 import * as React from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { ScrollView, View } from 'react-native';
-import { FAB, Text } from '@rneui/themed';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { ScrollView, View, Text, Pressable, ActivityIndicator } from 'react-native';
 import prompt from 'react-native-prompt-android';
+
 import { TODO_TABLE, TodoRecord, LIST_TABLE } from '../../../../library/powersync/AppSchema';
 import { useSystem } from '../../../../library/powersync/system';
 import { TodoItemWidget } from '../../../../library/widgets/TodoItemWidget';
@@ -57,7 +58,7 @@ const TodoView: React.FC = () => {
   );
 
   const toggleCompletion = async (record: TodoRecord, completed: boolean) => {
-    const updatedRecord = { ...record, completed: completed };
+    const updatedRecord = { ...record, completed };
     if (completed) {
       const { userID } = await system.supabaseConnector.fetchCredentials();
       updatedRecord.completed_at = new Date().toISOString();
@@ -108,37 +109,37 @@ const TodoView: React.FC = () => {
   };
 
   if (isLoading) {
-    <View>
-      <Text>Loading...</Text>
-    </View>;
+    return (
+      <View className="flex-1 items-center justify-center">
+        <ActivityIndicator size="large" />
+      </View>
+    );
   }
 
   if (listRecord == null) {
     return (
-      <View>
+      <View className="flex-1 p-4">
         <Stack.Screen
           options={{
             title: 'List not found'
           }}
         />
-        <Text>No matching List found, please navigate back...</Text>
+        <Text className="text-lg">No matching List found, please navigate back...</Text>
       </View>
     );
   }
 
   return (
-    <View style={{ flexGrow: 1 }}>
+    <View className="flex-1 bg-white">
       <Stack.Screen
         options={{
           title: listRecord.name
         }}
       />
-      <FAB
-        style={{ zIndex: 99, bottom: 0 }}
-        icon={{ name: 'add', color: 'white' }}
-        color="#aa00ff"
-        size="small"
-        placement="right"
+      
+      {/* FAB replacement */}
+      <Pressable 
+        className="absolute bottom-6 right-6 z-50 h-14 w-14 items-center justify-center rounded-full bg-purple-600 shadow-lg"
         onPress={() => {
           prompt(
             'Add a new Todo',
@@ -147,14 +148,16 @@ const TodoView: React.FC = () => {
               if (!text) {
                 return;
               }
-
               return createNewTodo(text);
             },
             { placeholder: 'Todo description', style: 'shimo' }
           );
         }}
-      />
-      <ScrollView style={{ maxHeight: '90%' }}>
+      >
+        <Ionicons name="add" size={24} color="white" />
+      </Pressable>
+
+      <ScrollView className="h-[90%]">
         {todos.map((r) => {
           const record = { ...r, id: r.todo_id };
           const photoRecord = toAttachmentRecord(r);
@@ -170,7 +173,7 @@ const TodoView: React.FC = () => {
           );
         })}
       </ScrollView>
-      <StatusBar style={'light'} />
+      <StatusBar style="light" />
     </View>
   );
 };

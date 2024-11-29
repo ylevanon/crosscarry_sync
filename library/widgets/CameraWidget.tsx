@@ -1,5 +1,11 @@
-import { CameraView, useCameraPermissions, CameraCapturedPicture } from 'expo-camera';
-import React, { useRef } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import {
+  CameraView,
+  useCameraPermissions,
+  CameraCapturedPicture,
+} from "expo-camera";
+import { CameraType } from "expo-camera/build/legacy/Camera.types";
+import React, { useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,18 +13,17 @@ import {
   View,
   useWindowDimensions,
   ActivityIndicator,
-  Platform
-} from 'react-native';
-import { Button, Icon } from '@rneui/themed';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { CameraType } from 'expo-camera/build/legacy/Camera.types';
+  Platform,
+  Button,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export interface Props {
   onCaptured: (photo: CameraCapturedPicture) => void;
   onClose: () => void;
 }
 
-const isAndroid = Platform.OS === 'android';
+const isAndroid = Platform.OS === "android";
 
 export const CameraWidget: React.FC<Props> = (props) => {
   const cameraRef = useRef<CameraView>(null);
@@ -40,7 +45,7 @@ export const CameraWidget: React.FC<Props> = (props) => {
       const options = {
         base64: true,
         quality: 0.5,
-        skipProcessing: isAndroid
+        skipProcessing: isAndroid,
       };
       const photo = await cameraRef.current.takePictureAsync(options);
       setLoading(false);
@@ -70,7 +75,9 @@ export const CameraWidget: React.FC<Props> = (props) => {
     // Camera permissions are not granted yet
     return (
       <View style={styles.container}>
-        <Text style={{ textAlign: 'center' }}>We need your permission to show the camera</Text>
+        <Text style={{ textAlign: "center" }}>
+          We need your permission to show the camera
+        </Text>
         <Button onPress={requestPermission} title="grant permission" />
       </View>
     );
@@ -79,21 +86,29 @@ export const CameraWidget: React.FC<Props> = (props) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.topBarContainer}>
-        <TouchableOpacity onPress={props.onClose} style={styles.topBarCloseIcon}>
-          <Icon name={'close'} type={'material'} color={'white'} size={32} />
+        <TouchableOpacity
+          onPress={props.onClose}
+          style={styles.topBarCloseIcon}
+        >
+          <Ionicons name="close" color="white" size={32} />
         </TouchableOpacity>
 
         <TouchableOpacity onPress={onFlipPress} style={styles.topBarFlipIcon}>
-          <Icon name={'flip-camera-ios'} type={'material'} color={'white'} size={32} />
+          <Ionicons name="camera-reverse" color="white" size={32} />
         </TouchableOpacity>
       </View>
       <CameraView
         ref={cameraRef}
-        style={{ ...styles.camera, height: height, width: '100%' }}
+        style={{ ...styles.camera, height, width: "100%" }}
         facing={facing}
-        onCameraReady={onReady}></CameraView>
+        onCameraReady={onReady}
+      />
       <View style={styles.bottomCamera}>
-        <TouchableOpacity disabled={loading} style={styles.shutterButton} onPress={captureImageAsync}>
+        <TouchableOpacity
+          disabled={loading}
+          style={styles.shutterButton}
+          onPress={captureImageAsync}
+        >
           <ActivityIndicator animating={loading} />
         </TouchableOpacity>
       </View>
@@ -104,57 +119,57 @@ export const CameraWidget: React.FC<Props> = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    backgroundColor: 'transparent'
+    flexDirection: "column",
+    justifyContent: "center",
+    backgroundColor: "transparent",
   },
   topBarContainer: {
     flex: 0,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
     padding: 20,
-    width: '100%',
-    backgroundColor: 'black',
-    height: 80
+    width: "100%",
+    backgroundColor: "black",
+    height: 80,
   },
   topBarCloseIcon: {
     flex: 1,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'flex-start'
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-start",
   },
   topBarFlipIcon: {
     flex: 1,
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'flex-end'
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-end",
   },
   camera: {
-    flex: 1
+    flex: 1,
   },
   bottomCamera: {
     flex: 0,
     // alignSelf: 'stretch',
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-    flexDirection: 'row',
+    alignItems: "flex-end",
+    justifyContent: "center",
+    flexDirection: "row",
     columnGap: 30,
-    backgroundColor: 'black',
-    minHeight: 100
+    backgroundColor: "black",
+    minHeight: 100,
   },
   shutterButton: {
     width: 70,
     height: 70,
     bottom: 15,
     borderRadius: 50,
-    backgroundColor: '#ffffff',
-    alignItems: 'center',
-    justifyContent: 'center'
+    backgroundColor: "#ffffff",
+    alignItems: "center",
+    justifyContent: "center",
   },
   text: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white'
-  }
+    fontWeight: "bold",
+    color: "white",
+  },
 });

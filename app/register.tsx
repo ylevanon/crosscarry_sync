@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { View, Text, ActivityIndicator, Button } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 import { SignInStyles } from "./signin";
 import { useSystem } from "../library/powersync/system";
@@ -25,12 +26,7 @@ export default function Register() {
       ) : (
         <View style={{ padding: 20, maxWidth: 400 }}>
           <StatusBar style="auto" />
-          <Icon
-            name="clipboard-account"
-            size={100}
-            type="material-community"
-            style={{ padding: 5 }}
-          />
+          <Ionicons name="airplane" size={100} style={{ padding: 5 }} />
 
           <TextInputWidget
             placeholder="Username"

@@ -1,4 +1,4 @@
-import { Icon } from "@rneui/themed";
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as React from "react";
@@ -31,12 +31,7 @@ export default function Signin() {
       ) : (
         <View style={{ padding: 20, maxWidth: 400 }}>
           <StatusBar style="auto" />
-          <Icon
-            name="login"
-            size={100}
-            type="material-community"
-            style={{ padding: 5 }}
-          />
+          <Ionicons name="log-in" size={100} style={{ padding: 5 }} />
           <TextInputWidget
             style={SignInStyles.input}
             inputMode="email"

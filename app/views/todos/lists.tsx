@@ -1,13 +1,13 @@
-import * as React from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { useQuery, useStatus } from '@powersync/react-native';
+import { router, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ScrollView, View } from 'react-native';
-import { FAB, Text } from '@rneui/themed';
+import * as React from 'react';
+import { ScrollView, View, Text, Pressable } from 'react-native';
 import prompt from 'react-native-prompt-android';
 
-import { router, Stack } from 'expo-router';
 import { LIST_TABLE, TODO_TABLE, ListRecord } from '../../../library/powersync/AppSchema';
 import { useSystem } from '../../../library/powersync/system';
-import { useQuery, useStatus } from '@powersync/react-native';
 import { ListItemWidget } from '../../../library/widgets/ListItemWidget';
 
 const description = (total: number, completed: number = 0) => {
@@ -51,19 +51,18 @@ const ListsViewWidget: React.FC = () => {
     });
   };
 
+
   return (
-    <View style={{ flex: 1, flexGrow: 1 }}>
+    <View className="flex-1">
       <Stack.Screen
         options={{
           headerShown: false
         }}
       />
-      <FAB
-        style={{ zIndex: 99, bottom: 0 }}
-        icon={{ name: 'add', color: 'white' }}
-        color="#aa00ff"
-        size="small"
-        placement="right"
+      
+      {/* FAB replacement */}
+      <Pressable 
+        className="absolute bottom-6 right-6 z-50 h-14 w-14 items-center justify-center rounded-full bg-purple-600 shadow-lg"
         onPress={() => {
           prompt(
             'Add a new list',
@@ -77,10 +76,15 @@ const ListsViewWidget: React.FC = () => {
             { placeholder: 'List name', style: 'shimo' }
           );
         }}
-      />
-      <ScrollView key={'lists'} style={{ maxHeight: '90%' }}>
+      >
+        <Ionicons name="add" size={24} color="white" />
+      </Pressable>
+
+      <ScrollView className="h-[90%]">
         {!status.hasSynced ? (
-          <Text>Busy with sync...</Text>
+          <View className="p-4">
+            <Text className="text-base text-gray-600">Busy with sync...</Text>
+          </View>
         ) : (
           listRecords.map((r) => (
             <ListItemWidget
@@ -99,7 +103,7 @@ const ListsViewWidget: React.FC = () => {
         )}
       </ScrollView>
 
-      <StatusBar style={'light'} />
+      <StatusBar style="light" />
     </View>
   );
 };
