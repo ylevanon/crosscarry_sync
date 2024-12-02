@@ -1,9 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useQuery, useStatus } from '@powersync/react-native';
-import { router, Stack } from 'expo-router';
+import { router, Stack, useNavigation } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as React from 'react';
-import { ScrollView, View, Text, Pressable } from 'react-native';
+import { ScrollView, View, Text, Pressable} from 'react-native';
 import prompt from 'react-native-prompt-android';
 
 import { LIST_TABLE, TODO_TABLE, ListRecord } from '../../../library/powersync/AppSchema';
@@ -31,7 +31,7 @@ const ListsViewWidget: React.FC = () => {
   const createNewList = async (name: string) => {
     const { userID } = await system.supabaseConnector.fetchCredentials();
 
-    const res = await system.powersync.execute(
+    const res = await system.powersync.execute( 
       `INSERT INTO ${LIST_TABLE} (id, created_at, name, owner_id) VALUES (uuid(), datetime(), ?, ?) RETURNING *`,
       [name, userID]
     );
@@ -56,7 +56,7 @@ const ListsViewWidget: React.FC = () => {
     <View className="flex-1">
       <Stack.Screen
         options={{
-          headerShown: false
+          headerShown: false,
         }}
       />
       
