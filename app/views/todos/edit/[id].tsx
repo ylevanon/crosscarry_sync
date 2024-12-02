@@ -1,19 +1,20 @@
-import { Ionicons } from '@expo/vector-icons';
-import { ATTACHMENT_TABLE, AttachmentRecord } from '@powersync/attachments';
-import { usePowerSync, useQuery } from '@powersync/react-native';
-import { CameraCapturedPicture } from 'expo-camera';
-import { Stack, useLocalSearchParams } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import _ from 'lodash';
-import * as React from 'react';
-import { ScrollView, View, Text, Pressable, ActivityIndicator } from 'react-native';
-import prompt from 'react-native-prompt-android';
+import { Ionicons } from "@expo/vector-icons";
+import { ATTACHMENT_TABLE, AttachmentRecord } from "@powersync/attachments";
+import { usePowerSync, useQuery } from "@powersync/react-native";
+import { CameraCapturedPicture } from "expo-camera";
+import { Stack, useLocalSearchParams } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import _ from "lodash";
+import * as React from "react";
+import { ScrollView, View, Text, Pressable, ActivityIndicator } from "react-native";
+import prompt from "react-native-prompt-android";
 
-import { TODO_TABLE, TodoRecord, LIST_TABLE } from '../../../../library/powersync/AppSchema';
-import { useSystem } from '../../../../library/powersync/system';
-import { TodoItemWidget } from '../../../../library/widgets/TodoItemWidget';
+import { TODO_TABLE, TodoRecord, LIST_TABLE } from "../../../../library/powersync/AppSchema";
+import { useSystem } from "../../../../library/powersync/system";
+import { TodoItemWidget } from "../../../../library/widgets/TodoItemWidget";
 
-type TodoEntry = TodoRecord & Partial<Omit<AttachmentRecord, 'id'>> & { todo_id: string; attachment_id: string | null };
+type TodoEntry = TodoRecord &
+  Partial<Omit<AttachmentRecord, "id">> & { todo_id: string; attachment_id: string | null };
 
 const toAttachmentRecord = _.memoize((entry: TodoEntry): AttachmentRecord | null => {
   return entry.attachment_id == null
@@ -25,7 +26,7 @@ const toAttachmentRecord = _.memoize((entry: TodoEntry): AttachmentRecord | null
         timestamp: entry.timestamp,
         local_uri: entry.local_uri,
         media_type: entry.media_type,
-        size: entry.size
+        size: entry.size,
       };
 });
 
@@ -36,7 +37,7 @@ const TodoView: React.FC = () => {
   const listID = params.id;
 
   const {
-    data: [listRecord]
+    data: [listRecord],
   } = useQuery<{ name: string }>(`SELECT name FROM ${LIST_TABLE} WHERE id = ?`, [listID]);
 
   const { data: todos, isLoading } = useQuery<TodoEntry>(
@@ -82,7 +83,10 @@ const TodoView: React.FC = () => {
       // We are sure the base64 is not null, as we are using the base64 option in the CameraWidget
       const { id: photoId } = await system.attachmentQueue.savePhoto(data.base64!);
 
-      await system.powersync.execute(`UPDATE ${TODO_TABLE} SET photo_id = ? WHERE id = ?`, [photoId, id]);
+      await system.powersync.execute(`UPDATE ${TODO_TABLE} SET photo_id = ? WHERE id = ?`, [
+        photoId,
+        id,
+      ]);
     }
   };
 
@@ -121,7 +125,7 @@ const TodoView: React.FC = () => {
       <View className="flex-1 p-4">
         <Stack.Screen
           options={{
-            title: 'List not found'
+            title: "List not found",
           }}
         />
         <Text className="text-lg">No matching List found, please navigate back...</Text>
@@ -133,24 +137,24 @@ const TodoView: React.FC = () => {
     <View className="flex-1 bg-white">
       <Stack.Screen
         options={{
-          title: listRecord.name
+          title: listRecord.name,
         }}
       />
-      
+
       {/* FAB replacement */}
-      <Pressable 
+      <Pressable
         className="absolute bottom-6 right-6 z-50 h-14 w-14 items-center justify-center rounded-full bg-purple-600 shadow-lg"
         onPress={() => {
           prompt(
-            'Add a new Todo',
-            '',
+            "Add a new Todo",
+            "",
             (text) => {
               if (!text) {
                 return;
               }
               return createNewTodo(text);
             },
-            { placeholder: 'Todo description', style: 'shimo' }
+            { placeholder: "Todo description", style: "shimo" }
           );
         }}
       >

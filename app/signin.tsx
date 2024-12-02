@@ -2,13 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as React from "react";
-import {
-  View,
-  Text,
-  ActivityIndicator,
-  StyleSheet,
-  Button,
-} from "react-native";
+import { View, Text, ActivityIndicator, StyleSheet, Button } from "react-native";
 
 import { useSystem } from "../library/powersync/system";
 import { TextInputWidget } from "../library/widgets/TextInputWidget";
@@ -23,9 +17,7 @@ export default function Signin() {
   const [error, setError] = React.useState("");
 
   return (
-    <View
-      style={{ flexGrow: 1, alignContent: "center", justifyContent: "center" }}
-    >
+    <View style={{ flexGrow: 1, alignContent: "center", justifyContent: "center" }}>
       {loading ? (
         <ActivityIndicator />
       ) : (
@@ -48,9 +40,7 @@ export default function Signin() {
             style={SignInStyles.input}
             placeholder="Password"
             secureTextEntry
-            onChangeText={(value) =>
-              setCredentials({ ...credentials, password: value })
-            }
+            onChangeText={(value) => setCredentials({ ...credentials, password: value })}
           />
           {error ? <Text style={{ color: "red" }}>{error}</Text> : null}
           <View style={SignInStyles.button_container}>
@@ -60,10 +50,7 @@ export default function Signin() {
                 setLoading(true);
                 setError("");
                 try {
-                  await supabaseConnector.login(
-                    credentials.username,
-                    credentials.password,
-                  );
+                  await supabaseConnector.login(credentials.username, credentials.password);
                   router.replace("views/todos/lists");
                 } catch (ex: any) {
                   console.error(ex);

@@ -55,15 +55,6 @@ const ListsViewWidget: React.FC = () => {
 
   return (
     <View className="flex-1 bg-gray-50">
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          headerTitle: "Todo Lists",
-          headerTitleStyle: { fontSize: 24, fontWeight: "bold", color: "white" },
-          headerStyle: { backgroundColor: "#6366F1" },
-        }}
-      />
-
       {/* FAB replacement */}
       <Pressable
         className="absolute bottom-6 right-6 z-50 h-14 w-14 items-center justify-center rounded-full bg-purple-600 shadow-lg active:bg-purple-700"

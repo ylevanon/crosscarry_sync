@@ -1,8 +1,10 @@
 import { PowerSyncContext } from "@powersync/react-native";
 import { SplashScreen, Stack } from "expo-router";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import React, { useEffect, useMemo } from "react";
 
 import { useSystem } from "../library/powersync/system";
+import { defaultHeaderConfig } from "../library/constants/headerConfig";
 
 /**
  * This App uses a nested navigation stack.
@@ -35,27 +37,28 @@ const HomeLayout = () => {
         await SplashScreen.hideAsync();
       } catch (e) {
         // Ignore errors
-        console.log('Error hiding splash screen:', e);
+        console.log("Error hiding splash screen:", e);
       }
     }
 
     hideSplash();
   }, []);
-  return (
-    <PowerSyncContext.Provider value={db}>
-      <Stack
-        screenOptions={{
-          headerTintColor: "#fff",
-          headerStyle: { backgroundColor: "#2196f3" },
-        }}
-      >
-        <Stack.Screen name="signin" options={{ title: "Supabase Login" }} />
-        <Stack.Screen name="register" options={{ title: "Register" }} />
 
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="views" options={{ headerShown: false }} />
-      </Stack>
-    </PowerSyncContext.Provider>
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <PowerSyncContext.Provider value={db}>
+        <Stack
+          screenOptions={{
+            ...defaultHeaderConfig,
+          }}
+        >
+          <Stack.Screen name="signin" options={{ title: "Supabase Login" }} />
+          <Stack.Screen name="register" options={{ title: "Register" }} />
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="views" options={{ headerShown: false }} />
+        </Stack>
+      </PowerSyncContext.Provider>
+    </GestureHandlerRootView>
   );
 };
 
