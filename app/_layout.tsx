@@ -1,6 +1,6 @@
 import { PowerSyncContext } from "@powersync/react-native";
-import { Stack } from "expo-router";
-import React, { useMemo } from "react";
+import { SplashScreen, Stack } from "expo-router";
+import React, { useEffect, useMemo } from "react";
 
 import { useSystem } from "../library/powersync/system";
 
@@ -18,10 +18,28 @@ import { useSystem } from "../library/powersync/system";
  *          - SQL Console
  *          - Sign out. Psuedo view to initiate signout flow. Navigates back to first layer.
  */
+
+SplashScreen.preventAutoHideAsync().catch(() => {
+  /* reloading the app might trigger some race conditions, ignore them */
+});
+
 const HomeLayout = () => {
   const system = useSystem();
   const db = useMemo(() => {
     return system.powersync;
+  }, []);
+
+  useEffect(() => {
+    async function hideSplash() {
+      try {
+        await SplashScreen.hideAsync();
+      } catch (e) {
+        // Ignore errors
+        console.log('Error hiding splash screen:', e);
+      }
+    }
+
+    hideSplash();
   }, []);
   return (
     <PowerSyncContext.Provider value={db}>
