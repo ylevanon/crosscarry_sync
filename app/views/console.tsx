@@ -1,11 +1,12 @@
-import _ from 'lodash';
-import React from 'react';
-import { Table, Row } from 'react-native-reanimated-table';
-import { QueryResult } from '@powersync/react-native';
-import { useSystem } from '../../library/powersync/system';
-import { ScrollView, TextInput } from 'react-native-gesture-handler';
+import { QueryResult } from "@powersync/react-native";
+import _ from "lodash";
+import React from "react";
+import { ScrollView, TextInput } from "react-native-gesture-handler";
+import { Table, Row } from "react-native-reanimated-table";
 
-const DEFAULT_QUERY = 'SELECT * from lists';
+import { useSystem } from "../../library/powersync/system";
+
+const DEFAULT_QUERY = "SELECT * from lists";
 
 const App: React.FC = () => {
   const { powersync } = useSystem();
@@ -13,7 +14,7 @@ const App: React.FC = () => {
 
   const executeQuery = React.useCallback(
     _.debounce(async (query: string) => {
-      console.debug('executing query', query);
+      console.debug("executing query", query);
       const result = await powersync.execute(query);
       setOutput(result);
     }, 1000),
@@ -29,11 +30,11 @@ const App: React.FC = () => {
   const cellKeys = firstItem ? Object.keys(firstItem) : [];
 
   return (
-    <ScrollView key={'console'} style={{ flex: 1, flexGrow: 1 }}>
+    <ScrollView key="console" style={{ flex: 1, flexGrow: 1 }}>
       <TextInput defaultValue={DEFAULT_QUERY} onChangeText={executeQuery} />
       {output ? (
         <Table borderStyle={{ borderWidth: 2 }}>
-          <Row style={{ backgroundColor: '#999' }} data={cellKeys} />
+          <Row style={{ backgroundColor: "#999" }} data={cellKeys} />
           {rows.map((row, index) => (
             <Row key={index.toString()} data={cellKeys.map((key) => row[key])} />
           ))}
