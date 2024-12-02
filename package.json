@@ -7,8 +7,11 @@
     "ios": "expo run:ios",
     "start": "expo start --dev-client",
     "clean": "watchman watch-del-all && rm -rf .expo",
-    "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
-    "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write"
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "validate": "npm run lint && npm run format:check"
   },
   "dependencies": {
     "@azure/core-asynciterator-polyfill": "^1.0.2",
@@ -65,7 +68,10 @@
     "@typescript-eslint/parser": "^7.7.0",
     "babel-preset-expo": "^11.0.5",
     "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-config-universe": "^12.0.1",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-native": "^4.1.0",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.11",
     "tailwindcss": "^3.4.0",
