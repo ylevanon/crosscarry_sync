@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery, useStatus } from "@powersync/react-native";
-import { router, Stack, useNavigation } from "expo-router";
+import { router, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as React from "react";
 import { ScrollView, View, Text, Pressable } from "react-native";
@@ -54,16 +54,19 @@ const ListsViewWidget: React.FC = () => {
   };
 
   return (
-    <View className="flex-1">
+    <View className="flex-1 bg-gray-50">
       <Stack.Screen
         options={{
-          headerShown: false,
+          headerShown: true,
+          headerTitle: "Todo Lists",
+          headerTitleStyle: { fontSize: 24, fontWeight: "bold", color: "white" },
+          headerStyle: { backgroundColor: "#6366F1" },
         }}
       />
 
       {/* FAB replacement */}
       <Pressable
-        className="absolute bottom-6 right-6 z-50 h-14 w-14 items-center justify-center rounded-full bg-purple-600 shadow-lg"
+        className="absolute bottom-6 right-6 z-50 h-14 w-14 items-center justify-center rounded-full bg-purple-600 shadow-lg active:bg-purple-700"
         onPress={() => {
           prompt(
             "Add a new list",
@@ -81,26 +84,49 @@ const ListsViewWidget: React.FC = () => {
         <Ionicons name="add" size={24} color="white" />
       </Pressable>
 
-      <ScrollView className="h-[90%]">
+      <ScrollView className="flex-1 px-4 py-2">
         {!status.hasSynced ? (
-          <View className="p-4">
-            <Text className="text-base text-gray-600">Busy with sync...</Text>
+          <View className="mt-4 rounded-lg bg-blue-50 p-4">
+            <Text className="text-center text-base text-blue-600">Synchronizing your lists...</Text>
+          </View>
+        ) : listRecords.length === 0 ? (
+          <View className="mt-4 rounded-lg bg-gray-50 p-4">
+            <Text className="text-center text-base text-gray-500">
+              No lists yet. Tap the + button to create one!
+            </Text>
           </View>
         ) : (
-          listRecords.map((r) => (
-            <ListItemWidget
-              key={r.id}
-              title={r.name}
-              description={description(r.total_tasks, r.completed_tasks)}
-              onDelete={() => deleteList(r.id)}
-              onPress={() => {
-                router.push({
-                  pathname: "views/todos/edit/[id]",
-                  params: { id: r.id },
-                });
-              }}
-            />
-          ))
+          <View className="space-y-2">
+            {listRecords.map((r) => (
+              <View key={r.id} className="overflow-hidden rounded-lg bg-white shadow-sm">
+                <Pressable
+                  className="flex-row items-center justify-between p-4 active:bg-gray-50"
+                  onPress={() => {
+                    router.push({
+                      pathname: "/views/todos/edit/[id]",
+                      params: { id: r.id },
+                    });
+                  }}
+                >
+                  <View className="flex-1">
+                    <Text className="text-lg font-medium text-gray-900">{r.name}</Text>
+                    <Text className="mt-1 text-sm text-gray-500">
+                      {description(r.total_tasks, r.completed_tasks)}
+                    </Text>
+                  </View>
+                  <View className="flex-row items-center space-x-4">
+                    <Pressable
+                      className="rounded-full p-2 active:bg-gray-100"
+                      onPress={() => deleteList(r.id)}
+                    >
+                      <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                    </Pressable>
+                    <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+                  </View>
+                </Pressable>
+              </View>
+            ))}
+          </View>
         )}
       </ScrollView>
 
