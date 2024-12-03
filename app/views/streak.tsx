@@ -1,15 +1,30 @@
-import React, { useState } from "react";
-import { View, Text } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, ScrollView } from "react-native";
 
 import { CardInputWidget } from "../../library/widgets/CardInputWidget";
 import { CheckboxWidget } from "../../library/widgets/CheckboxWidget";
+import { ProgressRingWidget } from "../../library/widgets/ProgressRingWidget";
+import { StreakWidget } from "../../library/widgets/StreakWidget";
 
 const StreakView = () => {
   const [goal, setGoal] = useState("");
+  const [checkedItems, setCheckedItems] = useState({
+    morning: false,
+    workout: false,
+    reading: false,
+  });
+
+  // Calculate progress
+  const totalTasks = Object.keys(checkedItems).length + (goal ? 1 : 0);
+  const completedTasks = Object.values(checkedItems).filter(Boolean).length + (goal ? 1 : 0);
+  const progress = totalTasks > 0 ? completedTasks / totalTasks : 0;
 
   return (
-    <View className="flex-1 bg-white">
-      <Text className="mx-4 my-6 text-2xl font-bold text-gray-900">Daily Streak</Text>
+    <ScrollView className="flex-1 bg-white">
+      <View className="flex-row items-center justify-between px-4 py-6">
+        <StreakWidget count={7} isComplete={progress === 1} />
+        <ProgressRingWidget progress={progress} />
+      </View>
 
       <CardInputWidget
         title="Set Daily Goal"
@@ -20,19 +35,25 @@ const StreakView = () => {
       />
 
       <View className="mt-6">
-        <Text className="mx-4 mb-2 text-lg font-semibold text-gray-900">Your Progress</Text>
-
         <CheckboxWidget
           title="Morning Routine"
           subtitle="Complete your morning tasks"
-          onPress={() => {}}
+          onPress={() => setCheckedItems((prev) => ({ ...prev, morning: !prev.morning }))}
         />
 
-        <CheckboxWidget title="Workout" subtitle="30 minutes of exercise" onPress={() => {}} />
+        <CheckboxWidget
+          title="Workout"
+          subtitle="30 minutes of exercise"
+          onPress={() => setCheckedItems((prev) => ({ ...prev, workout: !prev.workout }))}
+        />
 
-        <CheckboxWidget title="Reading" subtitle="Read for 20 minutes" onPress={() => {}} />
+        <CheckboxWidget
+          title="Reading"
+          subtitle="Read for 20 minutes"
+          onPress={() => setCheckedItems((prev) => ({ ...prev, reading: !prev.reading }))}
+        />
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
