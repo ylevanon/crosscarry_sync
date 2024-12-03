@@ -14,7 +14,7 @@ export const CheckboxWidget: React.FC<CheckboxWidgetProps> = ({ title, subtitle,
       <Pressable onPress={onPress} className="rounded-xl bg-orange-500 p-4">
         <View className="flex-row items-center justify-between">
           <View>
-            <Text className="text-xl font-medium text-white">{title}</Text>
+            <Text className="text-xl font-medium text-red-500">{title}</Text>
             {subtitle && <Text className="mt-0.5 text-sm text-white/80">{subtitle}</Text>}
           </View>
           <View className="rounded-lg bg-white/20 p-2">
