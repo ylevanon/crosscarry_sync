@@ -1,3 +1,4 @@
+import "../global.css";
 import { PowerSyncContext } from "@powersync/react-native";
 import { SplashScreen, Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
