@@ -1,52 +1,52 @@
 import React from "react";
 import { View, Text } from "react-native";
-import Svg, { Circle } from "react-native-svg";
+import Animated, {
+  useAnimatedStyle,
+  withTiming,
+  useSharedValue,
+  useAnimatedReaction,
+} from "react-native-reanimated";
 
 interface ProgressRingWidgetProps {
   progress: number; // 0 to 1
   size?: number;
-  strokeWidth?: number;
 }
 
-export const ProgressRingWidget: React.FC<ProgressRingWidgetProps> = ({
-  progress,
-  size = 120,
-  strokeWidth = 12,
-}) => {
-  const center = size / 2;
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - progress * circumference;
+export const ProgressRingWidget: React.FC<ProgressRingWidgetProps> = ({ progress, size = 110 }) => {
+  const rotation = useSharedValue(0);
+  const progressValue = Math.min(Math.max(progress, 0), 1);
+
+  useAnimatedReaction(
+    () => progressValue,
+    (value) => {
+      rotation.value = withTiming(value * 360, { duration: 500 });
+    },
+    [progressValue]
+  );
+
+  const circleStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value}deg` }],
+  }));
+
+  const progressStyle = useAnimatedStyle(() => {
+    return {
+      width: size,
+      height: size,
+      borderRadius: size / 2,
+      borderWidth: 10,
+      borderColor: "#22C55E",
+      borderTopColor: "#E5E7EB",
+      transform: [{ rotate: `${rotation.value}deg` }],
+    };
+  });
 
   return (
     <View className="items-center justify-center">
-      <Svg width={size} height={size}>
-        {/* Background circle */}
-        <Circle
-          cx={center}
-          cy={center}
-          r={radius}
-          stroke="#E5E7EB"
-          strokeWidth={strokeWidth}
-          fill="none"
-        />
-        {/* Progress circle */}
-        <Circle
-          cx={center}
-          cy={center}
-          r={radius}
-          stroke="#22C55E"
-          strokeWidth={strokeWidth}
-          strokeDasharray={`${circumference} ${circumference}`}
-          strokeDashoffset={strokeDashoffset}
-          strokeLinecap="round"
-          fill="none"
-          transform={`rotate(-90 ${center} ${center})`}
-        />
-      </Svg>
-      <Text className="absolute text-xl font-bold text-gray-700">
-        {Math.round(progress * 100)}%
-      </Text>
+      <Animated.View style={progressStyle} />
+      <View className="absolute items-center">
+        <Text className="text-3xl font-bold text-gray-900">{Math.round(progressValue * 100)}%</Text>
+        <Text className="text-sm text-gray-500">Complete</Text>
+      </View>
     </View>
   );
 };
