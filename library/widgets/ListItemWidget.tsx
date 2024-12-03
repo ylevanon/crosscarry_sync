@@ -1,7 +1,7 @@
-import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
-import { Alert, View, Text, Pressable } from 'react-native';
-import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { Alert, View, Text, Pressable } from "react-native";
+import Swipeable from "react-native-gesture-handler/Swipeable";
 
 export interface ListItemWidgetProps {
   title: string;
@@ -17,16 +17,13 @@ export const ListItemWidget: React.FC<ListItemWidgetProps> = ({
   onDelete,
 }) => {
   const renderRightActions = () => (
-    <Pressable 
+    <Pressable
       className="flex-1 justify-center bg-red-500/90 px-4"
       onPress={() => {
         Alert.alert(
-          'Confirm',
-          'This list will be permanently deleted',
-          [
-            { text: 'Cancel' },
-            { text: 'Delete', onPress: () => onDelete?.() }
-          ],
+          "Confirm",
+          "This list will be permanently deleted",
+          [{ text: "Cancel" }, { text: "Delete", onPress: () => onDelete?.() }],
           { cancelable: true }
         );
       }}
@@ -49,11 +46,9 @@ export const ListItemWidget: React.FC<ListItemWidgetProps> = ({
             <Ionicons name="list" size={24} color="gray" />
           </View>
 
-          <View className="flex-1 min-h-[80px]">
+          <View className="min-h-[80px] flex-1">
             <Text className="text-lg font-semibold text-gray-900">{title}</Text>
-            {description && (
-              <Text className="mt-1 text-sm text-gray-600">{description}</Text>
-            )}
+            {description && <Text className="mt-1 text-sm text-gray-600">{description}</Text>}
           </View>
 
           <View className="ml-2">

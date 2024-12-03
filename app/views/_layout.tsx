@@ -37,6 +37,14 @@ const Layout = () => {
         }}
       />
       <Tabs.Screen
+        name="streak"
+        options={{
+          title: "Streak",
+          tabBarLabel: "Streak",
+          tabBarIcon: ({ color, size }) => <Ionicons name="flame" size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="console"
         options={{
           title: "SQL Console",
@@ -45,7 +53,7 @@ const Layout = () => {
         }}
       />
       <Tabs.Screen
-        name="signout"
+        name="settings"
         options={{
           title: "Settings",
           tabBarLabel: "Settings",
