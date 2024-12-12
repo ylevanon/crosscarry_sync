@@ -5,38 +5,33 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: {
-          DEFAULT: '#DC1E1E',
-          light: '#E64646',
-          dark: '#B01818',
-        },
+        primary: '#DC1E1E',
         neutral: {
-          black: '#000000',
-          white: '#FFFFFF',
-          gray: {
-            50: '#F9FAFB',
-            100: '#F3F4F6',
-            200: '#E5E7EB',
-            300: '#D1D5DB',
-            400: '#9CA3AF',
-            500: '#6B7280',
-            600: '#4B5563',
-            700: '#374151',
-            800: '#1F2937',
-            900: '#111827',
-          },
+          900: '#000000', // Main background
+          800: '#1F1F1F', // Input backgrounds
+          700: '#2D2D2D', // Borders
+          600: '#3D3D3D',
+          500: '#6B7280',
+          400: '#9CA3AF',
+          300: '#D1D5DB',
+          200: '#E5E7EB',
+          100: '#F3F4F6',
+          50: '#F9FAFB',
         },
       },
-      fontFamily: {
-        "lemon-milk": ["LemonMilkRegular"],
-        "lemon-milk-italic": ["LemonMilkRegularItalic"],
-        "lemon-milk-light": ["LemonMilkLight"],
-        "lemon-milk-light-italic": ["LemonMilkLightItalic"],
-        "lemon-milk-medium": ["LemonMilkMedium"],
-        "lemon-milk-medium-italic": ["LemonMilkMediumItalic"],
-        "lemon-milk-bold": ["LemonMilkBold"],
-        "lemon-milk-bold-italic": ["LemonMilkBoldItalic"],
-      },
+    },
+    fontFamily: {
+      // System font for body text
+      sans: ['System', 'sans-serif'],
+      // LemonMilk variants for headers and special text
+      "lemon-milk": ["LemonMilkRegular"],
+      "lemon-milk-italic": ["LemonMilkRegularItalic"],
+      "lemon-milk-light": ["LemonMilkLight"],
+      "lemon-milk-light-italic": ["LemonMilkLightItalic"],
+      "lemon-milk-medium": ["LemonMilkMedium"],
+      "lemon-milk-medium-italic": ["LemonMilkMediumItalic"],
+      "lemon-milk-bold": ["LemonMilkBold"],
+      "lemon-milk-bold-italic": ["LemonMilkBoldItalic"],
     },
   },
   plugins: [],

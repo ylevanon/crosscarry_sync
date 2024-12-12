@@ -64,11 +64,21 @@ const HomeLayout = () => {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1 }} className="app">
       <PowerSyncContext.Provider value={db}>
         <Stack
           screenOptions={{
             ...defaultHeaderConfig,
+            headerStyle: {
+              backgroundColor: '#000000',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontFamily: 'LemonMilkBold',
+            },
+            contentStyle: {
+              backgroundColor: '#000000',
+            },
           }}
         >
           <Stack.Screen name="signin" options={{ title: "Supabase Login" }} />

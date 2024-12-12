@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  .app {
+    @apply bg-neutral-900 text-white;
+  }
+  
+  body {
+    @apply bg-neutral-900 text-white font-sans;
+  }
+
+  /* Headers use LemonMilk */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-lemon-milk;
+  }
+}
+
+@layer components {
+  .input-field {
+    @apply bg-neutral-800 text-white rounded-lg p-3 border border-neutral-700;
+  }
+  
+  .btn-primary {
+    @apply bg-primary text-white font-lemon-milk-bold px-6 py-3 rounded-lg;
+  }
+}

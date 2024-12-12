@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as React from "react";
-import { View, Text, ActivityIndicator, StyleSheet, Button } from "react-native";
+import { View, Text, ActivityIndicator, StyleSheet, Pressable } from "react-native";
 
 import { useSystem } from "../library/powersync/system";
 import { TextInputWidget } from "../library/widgets/TextInputWidget";
@@ -17,19 +17,20 @@ export default function Signin() {
   const [error, setError] = React.useState("");
 
   return (
-    <View style={{ flexGrow: 1, alignContent: "center", justifyContent: "center" }} className="bg-neutral-white">
+    <View style={{ flexGrow: 1, alignContent: "center", justifyContent: "center" }}>
       {loading ? (
         <ActivityIndicator color="#DC1E1E" />
       ) : (
         <View style={{ padding: 20, maxWidth: 400 }} className="space-y-6">
-          <StatusBar style="auto" />
+          <StatusBar style="light" />
           <Ionicons name="log-in" size={100} style={{ padding: 5 }} className="text-primary" />
-          <Text className="font-lemon-milk-bold-italic text-4xl text-neutral-black">Welcome Back</Text>
+          <Text className="font-lemon-milk-bold text-4xl text-white">Welcome Back</Text>
           <TextInputWidget
             style={[SignInStyles.input]}
-            className="bg-neutral-gray-100 rounded-lg p-3"
+            className="input-field"
             inputMode="email"
             placeholder="Username"
+            placeholderTextColor="#6B7280"
             autoCapitalize="none"
             onChangeText={(value) =>
               setCredentials({
@@ -40,16 +41,16 @@ export default function Signin() {
           />
           <TextInputWidget
             style={[SignInStyles.input]}
-            className="bg-neutral-gray-100 rounded-lg p-3"
+            className="input-field"
             placeholder="Password"
+            placeholderTextColor="#6B7280"
             secureTextEntry
             onChangeText={(value) => setCredentials({ ...credentials, password: value })}
           />
-          {error ? <Text className="text-primary">{error}</Text> : null}
-          <View style={SignInStyles.button_container}>
-            <Button
-              title="Login"
-              color="#DC1E1E"
+          {error ? <Text className="text-primary font-sans">{error}</Text> : null}
+          <View className="mt-6">
+            <Pressable 
+              className="btn-primary" 
               onPress={async () => {
                 setLoading(true);
                 setError("");
@@ -63,15 +64,19 @@ export default function Signin() {
                   setLoading(false);
                 }
               }}
-            />
+            >
+              <Text className="text-white">Login</Text>
+            </Pressable>
           </View>
-          <View style={SignInStyles.button_container}>
-            <Button
-              title="Register"
+          <View className="mt-6">
+            <Pressable 
+              className="btn-secondary" 
               onPress={async () => {
                 router.push("register");
               }}
-            />
+            >
+              <Text className="text-white">Register</Text>
+            </Pressable>
           </View>
         </View>
       )}
@@ -82,8 +87,5 @@ export default function Signin() {
 export const SignInStyles = StyleSheet.create({
   input: {
     fontSize: 14,
-  },
-  button_container: {
-    marginTop: 20,
   },
 });
