@@ -66,7 +66,7 @@ export default function Signin() {
           <StatusBar style="light" />
 
           <Image
-            source={require("../assets/pngs/FOLLOW40-Logos-07.png")}
+            source={require("../assets/pngs/FOLLOW40-Logos-08.png")}
             className="mb-10 mt-5 h-60 w-full self-center"
             resizeMode="contain"
           />

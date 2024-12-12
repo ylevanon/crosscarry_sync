@@ -1,12 +1,52 @@
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { View, Text, ActivityIndicator, Button } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { View, Text, ActivityIndicator, Image, Pressable } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  runOnJS,
+} from "react-native-reanimated";
 
-import { SignInStyles } from "./signin";
 import { useSystem } from "../library/powersync/system";
 import { TextInputWidget } from "../library/widgets/TextInputWidget";
+
+const AnimatedButton = ({
+  onPress,
+  children,
+  className,
+}: {
+  onPress: () => void;
+  children: React.ReactNode;
+  className: string;
+}) => {
+  const scale = useSharedValue(1);
+
+  const tap = Gesture.Tap()
+    .onBegin(() => {
+      "worklet";
+      scale.value = withSpring(0.95, { damping: 15, stiffness: 400 });
+    })
+    .onFinalize(() => {
+      "worklet";
+      scale.value = withSpring(1, { damping: 15, stiffness: 400 });
+      runOnJS(onPress)();
+    });
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  return (
+    <GestureDetector gesture={tap}>
+      <Animated.View style={animatedStyle} className={className}>
+        {children}
+      </Animated.View>
+    </GestureDetector>
+  );
+};
 
 export default function Register() {
   const { supabaseConnector } = useSystem();
@@ -18,42 +58,54 @@ export default function Register() {
   const [error, setError] = React.useState("");
 
   return (
-    <View
-      style={{ flexGrow: 1, alignContent: "center", justifyContent: "center" }}
-    >
+    <View className="flex-1 items-center justify-center bg-black">
       {loading ? (
-        <ActivityIndicator />
+        <ActivityIndicator color="#DC1E1E" />
       ) : (
-        <View style={{ padding: 20, maxWidth: 400 }}>
-          <StatusBar style="auto" />
-          <Ionicons name="airplane" size={100} style={{ padding: 5 }} />
+        <View className="w-full max-w-[400px] space-y-8 px-5">
+          <StatusBar style="light" />
 
-          <TextInputWidget
-            placeholder="Username"
-            onChangeText={(value) =>
-              setCredentials({ ...credentials, username: value })
-            }
+          <Image
+            source={require("../assets/pngs/FOLLOW40-Logos-07.png")}
+            className="mb-10 mt-5 h-60 w-full self-center"
+            resizeMode="contain"
           />
-          <TextInputWidget
-            placeholder="Password"
-            secureTextEntry
-            onChangeText={(value) =>
-              setCredentials({ ...credentials, password: value })
-            }
-          />
-          {error ? <Text style={{ color: "red" }}>{error}</Text> : null}
-          <View style={SignInStyles.button_container}>
-            <Button
-              title="Sign Up"
+
+          <View className="mb-6 space-y-3">
+            <TextInputWidget
+              className="input-field"
+              inputMode="email"
+              placeholder="Username"
+              placeholderTextColor="#6B7280"
+              autoCapitalize="none"
+              onChangeText={(value) =>
+                setCredentials({
+                  ...credentials,
+                  username: value.toLowerCase().trim(),
+                })
+              }
+            />
+            <TextInputWidget
+              className="input-field"
+              placeholder="Password"
+              placeholderTextColor="#6B7280"
+              secureTextEntry
+              onChangeText={(value) => setCredentials({ ...credentials, password: value })}
+            />
+          </View>
+
+          {error ? <Text className="text-primary font-sans">{error}</Text> : null}
+
+          <View className="space-y-3">
+            <AnimatedButton
               onPress={async () => {
                 setLoading(true);
                 setError("");
                 try {
-                  const { data, error } =
-                    await supabaseConnector.client.auth.signUp({
-                      email: credentials.username,
-                      password: credentials.password,
-                    });
+                  const { data, error } = await supabaseConnector.client.auth.signUp({
+                    email: credentials.username,
+                    password: credentials.password,
+                  });
                   if (error) {
                     throw error;
                   }
@@ -70,7 +122,10 @@ export default function Register() {
                   setLoading(false);
                 }
               }}
-            />
+              className="bg-primary rounded-lg px-4 py-3"
+            >
+              <Text className="text-center font-lemon-milk text-lg text-white">Sign Up</Text>
+            </AnimatedButton>
           </View>
         </View>
       )}

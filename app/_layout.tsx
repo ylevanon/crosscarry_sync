@@ -81,7 +81,7 @@ const HomeLayout = () => {
             },
           }}
         >
-          <Stack.Screen name="signin" options={{ title: "Sign In" }} />
+          <Stack.Screen name="signin" options={{ headerShown: false }} />
           <Stack.Screen name="register" options={{ title: "Register" }} />
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="views" options={{ headerShown: false }} />
