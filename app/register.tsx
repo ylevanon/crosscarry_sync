@@ -1,13 +1,16 @@
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { View, Text, ActivityIndicator, Image, Pressable } from "react-native";
+import { View, Text, ActivityIndicator, Image, Dimensions } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
+  withTiming,
   runOnJS,
+  FadeIn,
+  FadeOut,
 } from "react-native-reanimated";
 
 import { useSystem } from "../library/powersync/system";
@@ -48,6 +51,28 @@ const AnimatedButton = ({
   );
 };
 
+const OnboardingSlide = ({
+  title,
+  description,
+  image,
+}: {
+  title: string;
+  description: string;
+  image: any;
+}) => {
+  return (
+    <Animated.View
+      entering={FadeIn.duration(500)}
+      exiting={FadeOut.duration(500)}
+      className="w-full items-center justify-center px-5"
+    >
+      <Image source={image} className="mb-8 h-60 w-full" resizeMode="contain" />
+      <Text className="font-lemon-milk-bold mb-4 text-center text-2xl text-white">{title}</Text>
+      <Text className="text-center font-lemon-milk text-base text-gray-300">{description}</Text>
+    </Animated.View>
+  );
+};
+
 export default function Register() {
   const { supabaseConnector } = useSystem();
   const [loading, setLoading] = React.useState(false);
@@ -56,6 +81,71 @@ export default function Register() {
     password: "",
   });
   const [error, setError] = React.useState("");
+  const [showTutorial, setShowTutorial] = React.useState(false);
+  const [currentSlide, setCurrentSlide] = React.useState(0);
+
+  const slides = [
+    {
+      title: "Welcome to FOLLOW",
+      description:
+        "Your journey to better fitness starts here. Track your workouts, set goals, and crush them!",
+      image: require("../assets/pngs/FOLLOW40-Logos-08.png"),
+    },
+    {
+      title: "Track Your Progress",
+      description:
+        "Log your workouts, monitor your gains, and watch your strength grow day by day.",
+      image: require("../assets/pngs/FOLLOW40-Logos-08.png"),
+    },
+    {
+      title: "Join the Community",
+      description:
+        "Connect with fellow fitness enthusiasts, share your achievements, and stay motivated together!",
+      image: require("../assets/pngs/FOLLOW40-Logos-08.png"),
+    },
+  ];
+
+  const handleSuccess = async () => {
+    setShowTutorial(true);
+  };
+
+  if (showTutorial) {
+    return (
+      <View className="flex-1 items-center justify-between bg-black py-10">
+        <StatusBar style="light" />
+
+        <OnboardingSlide {...slides[currentSlide]} />
+
+        <View className="w-full space-y-4 px-5">
+          <View className="flex-row justify-center space-x-2">
+            {slides.map((_, index) => (
+              <View
+                key={index}
+                className={`h-2 w-2 rounded-full ${
+                  index === currentSlide ? "bg-primary" : "bg-gray-600"
+                }`}
+              />
+            ))}
+          </View>
+
+          <AnimatedButton
+            onPress={() => {
+              if (currentSlide < slides.length - 1) {
+                setCurrentSlide(currentSlide + 1);
+              } else {
+                router.replace("views/todos/lists");
+              }
+            }}
+            className="bg-primary rounded-lg px-4 py-3"
+          >
+            <Text className="text-center font-lemon-milk text-lg text-white">
+              {currentSlide === slides.length - 1 ? "Get Started" : "Next"}
+            </Text>
+          </AnimatedButton>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 items-center justify-center bg-black">
@@ -66,7 +156,7 @@ export default function Register() {
           <StatusBar style="light" />
 
           <Image
-            source={require("../assets/pngs/FOLLOW40-Logos-07.png")}
+            source={require("../assets/pngs/FOLLOW40-Logos-08.png")}
             className="mb-10 mt-5 h-60 w-full self-center"
             resizeMode="contain"
           />
@@ -111,7 +201,7 @@ export default function Register() {
                   }
                   if (data.session) {
                     supabaseConnector.client.auth.setSession(data.session);
-                    router.replace("views/todos/lists");
+                    handleSuccess();
                   } else {
                     router.replace("signin");
                   }
