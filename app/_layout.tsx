@@ -70,18 +70,18 @@ const HomeLayout = () => {
           screenOptions={{
             ...defaultHeaderConfig,
             headerStyle: {
-              backgroundColor: '#000000',
+              backgroundColor: "#000000",
             },
-            headerTintColor: '#fff',
+            headerTintColor: "#fff",
             headerTitleStyle: {
-              fontFamily: 'LemonMilkBold',
+              fontFamily: "LemonMilkBold",
             },
             contentStyle: {
-              backgroundColor: '#000000',
+              backgroundColor: "#000000",
             },
           }}
         >
-          <Stack.Screen name="signin" options={{ title: "Supabase Login" }} />
+          <Stack.Screen name="signin" options={{ title: "Sign In" }} />
           <Stack.Screen name="register" options={{ title: "Register" }} />
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="views" options={{ headerShown: false }} />
