@@ -1,11 +1,12 @@
 import "../global.css";
 import { PowerSyncContext } from "@powersync/react-native";
+import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import React, { useEffect, useMemo } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import { useSystem } from "../library/powersync/system";
 import { defaultHeaderConfig } from "../library/constants/headerConfig";
+import { useSystem } from "../library/powersync/system";
 
 /**
  * This App uses a nested navigation stack.
@@ -32,10 +33,23 @@ const HomeLayout = () => {
     return system.powersync;
   }, []);
 
+  const [fontsLoaded] = useFonts({
+    LemonMilkRegular: require("../assets/fonts/LEMONMILK-Regular.otf"),
+    LemonMilkRegularItalic: require("../assets/fonts/LEMONMILK-RegularItalic.otf"),
+    LemonMilkLight: require("../assets/fonts/LEMONMILK-Light.otf"),
+    LemonMilkLightItalic: require("../assets/fonts/LEMONMILK-LightItalic.otf"),
+    LemonMilkMedium: require("../assets/fonts/LEMONMILK-Medium.otf"),
+    LemonMilkMediumItalic: require("../assets/fonts/LEMONMILK-MediumItalic.otf"),
+    LemonMilkBold: require("../assets/fonts/LEMONMILK-Bold.otf"),
+    LemonMilkBoldItalic: require("../assets/fonts/LEMONMILK-BoldItalic.otf"),
+  });
+
   useEffect(() => {
     async function hideSplash() {
       try {
-        await SplashScreen.hideAsync();
+        if (fontsLoaded) {
+          await SplashScreen.hideAsync();
+        }
       } catch (e) {
         // Ignore errors
         console.log("Error hiding splash screen:", e);
@@ -43,7 +57,11 @@ const HomeLayout = () => {
     }
 
     hideSplash();
-  }, []);
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Text, TextInput, TextInputProps, StyleSheet, View } from 'react-native';
+import React from "react";
+import { Text, TextInput, TextInputProps, StyleSheet, View } from "react-native";
 
 export interface TextInputWidgetProps extends TextInputProps {
   label?: string;
@@ -20,6 +20,6 @@ const styles = StyleSheet.create({
     height: 40,
     margin: 12,
     borderWidth: 1,
-    padding: 10
-  }
+    padding: 10,
+  },
 });

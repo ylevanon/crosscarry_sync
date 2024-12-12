@@ -1,80 +1,115 @@
 {
-    "expo": {
-      "name": "crosscarry",
-      "slug": "crosscarry",
-      "version": "1.0.0",
-      "scheme": "crosscarry",
-      "web": {
-        "bundler": "metro",
-        "output": "static",
-        "favicon": "./assets/favicon.png"
-      },
-      "plugins": [
-        "expo-router",
-        [
-          "expo-dev-launcher",
-          {
-            "launchMode": "most-recent"
-          }
-        ],
-        [
-          "expo-camera",
-          {
-            "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera."
-          }
-        ],
-        [
-          "expo-build-properties",
-          {
-            "ios": {
-              "deploymentTarget": "13.4",
-              "newArchEnabled": true
-            },
-            "android": {
-              "minSdkVersion": 23,
-              "compileSdkVersion": 34,
-              "targetSdkVersion": 34,
-              "buildToolsVersion": "34.0.0",
-              "newArchEnabled": true
-            }
-          }
-        ],
-        "expo-secure-store"
+  "expo": {
+    "name": "crosscarry",
+    "slug": "crosscarry",
+    "version": "1.0.0",
+    "scheme": "crosscarry",
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-dev-launcher",
+        {
+          "launchMode": "most-recent"
+        }
       ],
-      "experiments": {
-        "typedRoutes": true,
-        "tsconfigPaths": true
-      },
-      "orientation": "portrait",
-      "icon": "./assets/icon.png",
-      "userInterfaceStyle": "light",
-      "splash": {
-        "image": "./assets/splash.png",
-        "resizeMode": "contain",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "13.4",
+            "newArchEnabled": true
+          },
+          "android": {
+            "minSdkVersion": 23,
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "34.0.0",
+            "newArchEnabled": true
+          }
+        }
+      ],
+      "expo-secure-store",
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "tsconfigPaths": true
+    },
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*",
+      "assets/**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ylevanon.crosscarry"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "assetBundlePatterns": [
-        "**/*"
-      ],
-      "ios": {
-        "supportsTablet": true,
-        "bundleIdentifier": "com.ylevanon.crosscarry"
+      "package": "com.ylevanon.crosscarry"
+    },
+    "fonts": [
+      {
+        "asset": "./assets/fonts/LEMONMILK-Regular.otf",
+        "name": "LemonMilkRegular"
       },
-      "android": {
-        "adaptiveIcon": {
-          "foregroundImage": "./assets/adaptive-icon.png",
-          "backgroundColor": "#ffffff"
-        },
-        "package": "com.ylevanon.crosscarry"
+      {
+        "asset": "./assets/fonts/LEMONMILK-RegularItalic.otf",
+        "name": "LemonMilkRegularItalic"
       },
-      "extra": {
-        "router": {
-          "origin": false
-        },
-        "eas": {
-          "projectId": "a5221f07-ce4b-40bb-a312-02633ed341a7"
-        }
+      {
+        "asset": "./assets/fonts/LEMONMILK-Light.otf",
+        "name": "LemonMilkLight"
+      },
+      {
+        "asset": "./assets/fonts/LEMONMILK-LightItalic.otf",
+        "name": "LemonMilkLightItalic"
+      },
+      {
+        "asset": "./assets/fonts/LEMONMILK-Medium.otf",
+        "name": "LemonMilkMedium"
+      },
+      {
+        "asset": "./assets/fonts/LEMONMILK-MediumItalic.otf",
+        "name": "LemonMilkMediumItalic"
+      },
+      {
+        "asset": "./assets/fonts/LEMONMILK-Bold.otf",
+        "name": "LemonMilkBold"
+      },
+      {
+        "asset": "./assets/fonts/LEMONMILK-BoldItalic.otf",
+        "name": "LemonMilkBoldItalic"
+      }
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "a5221f07-ce4b-40bb-a312-02633ed341a7"
       }
     }
   }
-  
+}
