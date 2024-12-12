@@ -41,6 +41,14 @@ const Layout = () => {
         }}
       >
         <Tabs.Screen
+          name="onboarding"
+          options={{
+            headerShown: false,
+            tabBarStyle: { display: 'none' },
+            tabBarButton: () => null,
+          }}
+        />
+        <Tabs.Screen
           name="todos"
           options={{
             headerShown: false,
