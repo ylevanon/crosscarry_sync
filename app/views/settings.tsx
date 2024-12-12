@@ -10,7 +10,6 @@ const SettingsView = () => {
   const [userEmail, setUserEmail] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    // Fetch user email when component mounts
     const fetchUserEmail = async () => {
       const {
         data: { user },
@@ -28,31 +27,30 @@ const SettingsView = () => {
   };
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-neutral-900">
       {/* Profile Section */}
-      <View className="m-4 rounded-lg bg-white p-4 shadow-sm">
+      <View className="m-4 rounded-lg bg-neutral-800 p-4">
         <View className="mb-4 items-center">
-          <View className="h-20 w-20 items-center justify-center rounded-full bg-purple-100">
-            <Ionicons name="person" size={40} color="#6366F1" />
+          <View className="h-20 w-20 items-center justify-center rounded-full bg-neutral-700">
+            <Ionicons name="person" size={40} color="#DC1E1E" />
           </View>
-          <Text className="mt-2 text-lg font-semibold text-gray-900">
+          <Text className="mt-2 text-lg font-lemon-milk text-white">
             {userEmail ?? "Loading..."}
           </Text>
         </View>
       </View>
 
       {/* Settings Options */}
-      <View className="m-4 rounded-lg bg-white shadow-sm">
-        {/* Add more settings options here */}
+      <View className="m-4 rounded-lg bg-neutral-800">
         <Pressable
-          className="flex-row items-center justify-between border-b border-gray-100 p-4"
+          className="flex-row items-center justify-between border-b border-neutral-700 p-4"
           onPress={handleSignOut}
         >
-          <View className="flex-row items-center">
-            <Ionicons name="log-out-outline" size={24} color="#EF4444" />
-            <Text className="ml-3 text-base font-medium text-red-500">Sign Out</Text>
+          <View className="flex-row items-center space-x-3">
+            <Ionicons name="log-out-outline" size={24} color="#DC1E1E" />
+            <Text className="text-white">Sign Out</Text>
           </View>
-          <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+          <Ionicons name="chevron-forward" size={24} color="#6B7280" />
         </Pressable>
       </View>
     </View>

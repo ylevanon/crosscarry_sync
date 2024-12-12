@@ -1,9 +1,13 @@
+import { colors } from '../theme/colors';
+
 export const defaultHeaderConfig = {
-  headerStyle: { backgroundColor: "#6366F1" },
+  headerStyle: { 
+    backgroundColor: colors.neutral[900],
+  },
   headerTitleStyle: {
     fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
+    fontFamily: 'LemonMilkBold',
+    color: '#fff',
   },
-  headerTintColor: "white", // For back button and other icons
+  headerTintColor: '#fff', // For back button and other icons
 };
