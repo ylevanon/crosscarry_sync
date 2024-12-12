@@ -9,6 +9,8 @@ import Animated, {
   runOnJS,
 } from "react-native-reanimated";
 
+import { colors } from "../theme/colors";
+
 interface CheckboxWidgetProps {
   title: string;
   subtitle?: string;
@@ -30,7 +32,6 @@ export const CheckboxWidget: React.FC<CheckboxWidgetProps> = ({ title, subtitle,
       "worklet";
       pressed.value = false;
       scale.value = withSpring(1, { damping: 15, stiffness: 400 });
-      // State updates and callbacks need to run on JS thread
       runOnJS(setIsPressed)(!isPressed);
       runOnJS(onPress)();
     });
@@ -43,29 +44,40 @@ export const CheckboxWidget: React.FC<CheckboxWidgetProps> = ({ title, subtitle,
     <View className="mx-4 my-1">
       <GestureDetector gesture={tap}>
         <Animated.View style={animatedStyle}>
-          <View className={`rounded-xl p-4 ${isPressed ? "bg-green-500" : "bg-gray-200"}`}>
+          <View 
+            style={{ 
+              backgroundColor: isPressed ? colors.achievement.gold : colors.neutral[700],
+              borderRadius: 12,
+              padding: 16,
+            }}
+          >
             <View className="flex-row items-center justify-between">
               <View>
                 <Text
-                  className={`text-xl font-medium ${isPressed ? "text-white" : "text-gray-900"}`}
+                  style={{
+                    fontFamily: 'LemonMilkMedium',
+                    fontSize: 20,
+                    color: isPressed ? colors.neutral[900] : '#fff',
+                  }}
                 >
                   {title}
                 </Text>
                 {subtitle && (
                   <Text
-                    className={`mt-0.5 text-sm ${isPressed ? "text-white/80" : "text-gray-600"}`}
+                    style={{
+                      color: isPressed ? colors.neutral[800] : colors.neutral[400],
+                      marginTop: 2,
+                    }}
                   >
                     {subtitle}
                   </Text>
                 )}
               </View>
-              <View className={`rounded-lg p-2 ${isPressed ? "bg-white/20" : "bg-white/50"}`}>
-                <Ionicons
-                  name="compass-outline"
-                  size={18}
-                  color={isPressed ? "white" : "#4B5563"}
-                />
-              </View>
+              <Ionicons
+                name={isPressed ? "checkmark-circle" : "checkmark-circle-outline"}
+                size={24}
+                color={isPressed ? colors.neutral[900] : colors.neutral[500]}
+              />
             </View>
           </View>
         </Animated.View>

@@ -10,6 +10,8 @@ import Animated, {
   runOnJS,
 } from "react-native-reanimated";
 
+import { colors } from "../theme/colors";
+
 interface CardInputWidgetProps {
   title: string;
   subtitle?: string;
@@ -61,35 +63,72 @@ export const CardInputWidget: React.FC<CardInputWidgetProps> = ({
     transform: [{ scale: scale.value }],
   }));
 
-  const hasContent = value.length > 0;
+  const hasValue = value.length > 0;
 
   return (
-    <View className="mx-4 my-1">
+    <View className="mx-4 mt-6">
       <GestureDetector gesture={tap}>
         <Animated.View style={animatedStyle}>
-          <View className={`rounded-xl p-4 ${hasContent ? "bg-green-500" : "bg-gray-200"}`}>
+          <View
+            style={{
+              backgroundColor: hasValue ? colors.achievement.gold : colors.neutral[700],
+              borderRadius: 12,
+              padding: 16,
+            }}
+          >
             <View className="flex-row items-center justify-between">
-              <View>
-                <Text
-                  className={`text-xl font-medium ${hasContent ? "text-white" : "text-gray-900"}`}
-                >
-                  {value || title}
-                </Text>
-                {subtitle && (
-                  <Text
-                    className={`mt-0.5 text-sm ${hasContent ? "text-white/80" : "text-gray-600"}`}
-                  >
-                    {subtitle}
-                  </Text>
+              <View className="flex-1">
+                {hasValue ? (
+                  <>
+                    <Text
+                      style={{
+                        fontFamily: "LemonMilkMedium",
+                        fontSize: 14,
+                        color: colors.neutral[900],
+                        marginBottom: 4,
+                      }}
+                    >
+                      {title}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        color: colors.neutral[900],
+                      }}
+                    >
+                      {value}
+                    </Text>
+                  </>
+                ) : (
+                  <>
+                    <Text
+                      style={{
+                        fontFamily: "LemonMilkMedium",
+                        fontSize: 20,
+                        color: "#fff",
+                        marginBottom: subtitle ? 2 : 0,
+                      }}
+                    >
+                      {title}
+                    </Text>
+                    {subtitle && (
+                      <Text
+                        style={{
+                          color: colors.neutral[400],
+                        }}
+                      >
+                        {subtitle}
+                      </Text>
+                    )}
+                  </>
                 )}
               </View>
-              <View className={`rounded-lg p-2 ${hasContent ? "bg-white/20" : "bg-white/50"}`}>
-                <Ionicons
-                  name={hasContent ? "checkmark" : "create-outline"}
-                  size={18}
-                  color={hasContent ? "white" : "#4B5563"}
-                />
-              </View>
+              <Ionicons
+                name={hasValue ? "create" : "create-outline"}
+                size={24}
+                color={hasValue ? colors.neutral[900] : colors.neutral[500]}
+                style={{ marginLeft: 12 }}
+              />
             </View>
           </View>
         </Animated.View>
