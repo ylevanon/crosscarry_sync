@@ -1,52 +1,11 @@
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import * as React from "react";
-import { View, Text, ActivityIndicator, StyleSheet, Image } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  runOnJS,
-} from "react-native-reanimated";
+import React from "react";
+import { View, Text, ActivityIndicator, Image, StyleSheet } from "react-native";
 
 import { useSystem } from "../library/powersync/system";
+import { AnimatedButton } from "../library/widgets/AnimatedButton";
 import { TextInputWidget } from "../library/widgets/TextInputWidget";
-
-const AnimatedButton = ({
-  onPress,
-  children,
-  className,
-}: {
-  onPress: () => void;
-  children: React.ReactNode;
-  className: string;
-}) => {
-  const scale = useSharedValue(1);
-
-  const tap = Gesture.Tap()
-    .onBegin(() => {
-      "worklet";
-      scale.value = withSpring(0.95, { damping: 15, stiffness: 400 });
-    })
-    .onFinalize(() => {
-      "worklet";
-      scale.value = withSpring(1, { damping: 15, stiffness: 400 });
-      runOnJS(onPress)();
-    });
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  return (
-    <GestureDetector gesture={tap}>
-      <Animated.View style={animatedStyle} className={className}>
-        {children}
-      </Animated.View>
-    </GestureDetector>
-  );
-};
 
 export default function Signin() {
   const { supabaseConnector } = useSystem();

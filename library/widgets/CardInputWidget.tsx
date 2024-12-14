@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { View, Text, Pressable } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import prompt from "react-native-prompt-android";
@@ -48,16 +48,20 @@ export const CardInputWidget: React.FC<CardInputWidgetProps> = ({
     );
   };
 
-  const tap = Gesture.Tap()
-    .onBegin(() => {
-      "worklet";
-      scale.value = withSpring(0.95, { damping: 15, stiffness: 400 });
-    })
-    .onFinalize(() => {
-      "worklet";
-      scale.value = withSpring(1, { damping: 15, stiffness: 400 });
-      runOnJS(showPrompt)();
-    });
+  const tap = useMemo(
+    () =>
+      Gesture.Tap()
+        .onBegin(() => {
+          "worklet";
+          scale.value = withSpring(0.95, { damping: 15, stiffness: 400 });
+        })
+        .onFinalize(() => {
+          "worklet";
+          scale.value = withSpring(1, { damping: 15, stiffness: 400 });
+          runOnJS(showPrompt)();
+        }),
+    [scale, showPrompt]
+  );
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],

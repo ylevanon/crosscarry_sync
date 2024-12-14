@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -22,19 +22,23 @@ export const CheckboxWidget: React.FC<CheckboxWidgetProps> = ({ title, subtitle,
   const pressed = useSharedValue(false);
   const scale = useSharedValue(1);
 
-  const tap = Gesture.Tap()
-    .onBegin(() => {
-      "worklet";
-      pressed.value = true;
-      scale.value = withSpring(0.95, { damping: 15, stiffness: 400 });
-    })
-    .onFinalize(() => {
-      "worklet";
-      pressed.value = false;
-      scale.value = withSpring(1, { damping: 15, stiffness: 400 });
-      runOnJS(setIsPressed)(!isPressed);
-      runOnJS(onPress)();
-    });
+  const tap = useMemo(
+    () =>
+      Gesture.Tap()
+        .onBegin(() => {
+          "worklet";
+          pressed.value = true;
+          scale.value = withSpring(0.95, { damping: 15, stiffness: 400 });
+        })
+        .onFinalize(() => {
+          "worklet";
+          pressed.value = false;
+          scale.value = withSpring(1, { damping: 15, stiffness: 400 });
+          runOnJS(setIsPressed)(!isPressed);
+          runOnJS(onPress)();
+        }),
+    [onPress, scale, pressed, isPressed]
+  );
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -44,8 +48,8 @@ export const CheckboxWidget: React.FC<CheckboxWidgetProps> = ({ title, subtitle,
     <View className="mx-4 my-1">
       <GestureDetector gesture={tap}>
         <Animated.View style={animatedStyle}>
-          <View 
-            style={{ 
+          <View
+            style={{
               backgroundColor: isPressed ? colors.achievement.gold : colors.neutral[700],
               borderRadius: 12,
               padding: 16,
@@ -55,9 +59,9 @@ export const CheckboxWidget: React.FC<CheckboxWidgetProps> = ({ title, subtitle,
               <View>
                 <Text
                   style={{
-                    fontFamily: 'LemonMilkMedium',
+                    fontFamily: "LemonMilkMedium",
                     fontSize: 20,
-                    color: isPressed ? colors.neutral[900] : '#fff',
+                    color: isPressed ? colors.neutral[900] : "#fff",
                   }}
                 >
                   {title}

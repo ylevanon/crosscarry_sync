@@ -2,50 +2,9 @@ import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { View, Text, Image } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  runOnJS,
-  FadeIn,
-  FadeOut,
-} from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
-const AnimatedButton = ({
-  onPress,
-  children,
-  className,
-}: {
-  onPress: () => void;
-  children: React.ReactNode;
-  className: string;
-}) => {
-  const scale = useSharedValue(1);
-
-  const tap = Gesture.Tap()
-    .onBegin(() => {
-      "worklet";
-      scale.value = withSpring(0.95, { damping: 15, stiffness: 400 });
-    })
-    .onFinalize(() => {
-      "worklet";
-      scale.value = withSpring(1, { damping: 15, stiffness: 400 });
-      runOnJS(onPress)();
-    });
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  return (
-    <GestureDetector gesture={tap}>
-      <Animated.View style={animatedStyle} className={className}>
-        {children}
-      </Animated.View>
-    </GestureDetector>
-  );
-};
+import { AnimatedButton } from "../../library/widgets/AnimatedButton";
 
 const OnboardingSlide = ({
   title,
