@@ -6,7 +6,7 @@ import { AnimatedButton } from "../AnimatedButton";
 
 interface UsernameSlideProps {
   width: number;
-  onUsernameSubmit: (username: string) => void;
+  onUsernameSubmit: (username: string) => Promise<void>;
   onSkip: () => void;
 }
 
@@ -16,6 +16,17 @@ export const UsernameSlide: React.FC<UsernameSlideProps> = ({
   onSkip,
 }) => {
   const [username, setUsername] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!username.trim() || isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      await onUsernameSubmit(username.trim());
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <Animated.View
@@ -41,11 +52,13 @@ export const UsernameSlide: React.FC<UsernameSlideProps> = ({
       />
       <View className="w-full space-y-4">
         <AnimatedButton
-          onPress={() => onUsernameSubmit(username)}
+          onPress={handleSubmit}
           className="bg-primary rounded-lg px-4 py-3"
-          disabled={!username.trim()}
+          disabled={!username.trim() || isSubmitting}
         >
-          <Text className="text-center font-lemon-milk text-lg text-white">Continue</Text>
+          <Text className="text-center font-lemon-milk text-lg text-white">
+            {isSubmitting ? "Saving..." : "Continue"}
+          </Text>
         </AnimatedButton>
         <AnimatedButton onPress={onSkip} className="rounded-lg bg-neutral-800 px-4 py-3">
           <Text className="text-center font-lemon-milk text-lg text-gray-300">Skip for now</Text>

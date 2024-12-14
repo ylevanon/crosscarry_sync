@@ -1,54 +1,93 @@
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useRef, useState } from "react";
-import { View, Text, Image, FlatList, useWindowDimensions } from "react-native";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { View, FlatList, useWindowDimensions, Alert } from "react-native";
 
-import { AnimatedButton } from "../../library/widgets/AnimatedButton";
+import { PROFILE_TABLE } from "../../library/powersync/AppSchema";
+import { useSystem } from "../../library/powersync/system";
+import {
+  WelcomeSlide,
+  UsernameSlide,
+  ProfilePictureSlide,
+  GetStartedSlide,
+} from "../../library/widgets/onboarding";
 
-const onboardingData = [
-  {
-    id: "1",
-    title: "Welcome to CrossCarry",
-    description: "Track your workouts and progress with ease",
-    image: require("../../assets/pngs/FOLLOW40-Logos-08.png"),
-  },
-  {
-    id: "2",
-    title: "Sync Everywhere",
-    description: "Your data is always available, online or offline",
-    image: require("../../assets/pngs/FOLLOW40-Logos-08.png"),
-  },
-  {
-    id: "3",
-    title: "Join the Community",
-    description: "Connect with others and share your fitness journey",
-    image: require("../../assets/pngs/FOLLOW40-Logos-08.png"),
-  },
-];
+interface OnboardingData {
+  username?: string;
+}
 
 export default function Onboarding() {
   const { width } = useWindowDimensions();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [onboardingData, setOnboardingData] = useState<OnboardingData>({});
   const flatListRef = useRef<FlatList>(null);
+  const system = useSystem();
 
-  const renderItem = ({ item }: { item: (typeof onboardingData)[0] }) => {
-    return (
-      <Animated.View
-        entering={FadeIn.duration(500)}
-        exiting={FadeOut.duration(500)}
-        className="items-center justify-center px-5"
-        style={{ width }}
-      >
-        <Image source={item.image} className="mb-8 h-60 w-full" resizeMode="contain" />
-        <Text className="font-lemon-milk-bold mb-4 text-center text-2xl text-white">
-          {item.title}
-        </Text>
-        <Text className="text-center font-lemon-milk text-base text-gray-300">
-          {item.description}
-        </Text>
-      </Animated.View>
-    );
+  const handleNext = () => {
+    if (currentIndex < 3) {
+      flatListRef.current?.scrollToIndex({
+        index: currentIndex + 1,
+        animated: true,
+      });
+    } else {
+      router.replace("/views/todos/lists");
+    }
+  };
+
+  const handleUsernameSubmit = async (username: string) => {
+    try {
+      // Get current user's ID from system
+      const { userID } = await system.supabaseConnector.fetchCredentials();
+      if (!userID) throw new Error("No user ID found");
+
+      // Update or insert profile record
+      await system.powersync.execute(
+        `
+        UPDATE ${PROFILE_TABLE} 
+        SET username = ?, updated_at = datetime('now')
+        WHERE id = ?
+      `,
+        [username, userID]
+      );
+
+      setOnboardingData((prev) => ({ ...prev, username }));
+      handleNext();
+    } catch (error) {
+      Alert.alert("Error", "Failed to save username. Please try again.");
+      console.error("Failed to save username:", error);
+    }
+  };
+
+  // Simplified for now, just calls handleNext
+  const handlePictureSelect = (_uri: string) => {
+    handleNext();
+  };
+
+  const renderItem = ({ index }: { index: number }) => {
+    switch (index) {
+      case 0:
+        return <WelcomeSlide width={width} />;
+      case 1:
+        return (
+          <UsernameSlide
+            width={width}
+            onUsernameSubmit={handleUsernameSubmit}
+            onSkip={handleNext}
+          />
+        );
+      case 2:
+        return (
+          <ProfilePictureSlide
+            width={width}
+            onPictureSelect={handlePictureSelect}
+            onSkip={handleNext}
+          />
+        );
+      case 3:
+        return <GetStartedSlide width={width} onGetStarted={handleNext} />;
+      default:
+        return null;
+    }
   };
 
   const handleViewableItemsChanged = ({ viewableItems }: any) => {
@@ -57,24 +96,13 @@ export default function Onboarding() {
     }
   };
 
-  const handleNext = () => {
-    if (currentIndex === onboardingData.length - 1) {
-      router.replace("/views/todos/lists");
-    } else {
-      flatListRef.current?.scrollToIndex({
-        index: currentIndex + 1,
-        animated: true,
-      });
-    }
-  };
-
   return (
     <View className="flex-1 bg-black">
       <StatusBar style="light" />
       <View className="flex-1">
-        {/* Dot indicator - Adjust space-x-4 to increase/decrease dot spacing */}
+        {/* Dot indicator */}
         <View className="flex-row justify-center space-x-4 py-10">
-          {onboardingData.map((_, index) => (
+          {[0, 1, 2, 3].map((index) => (
             <View
               key={index}
               className={`mx-1 h-3 w-3 rounded-full ${
@@ -85,7 +113,7 @@ export default function Onboarding() {
         </View>
         <FlatList
           ref={flatListRef}
-          data={onboardingData}
+          data={[0, 1, 2, 3]} // Indices for our slides
           renderItem={renderItem}
           horizontal
           pagingEnabled
@@ -93,13 +121,6 @@ export default function Onboarding() {
           onViewableItemsChanged={handleViewableItemsChanged}
           viewabilityConfig={{ viewAreaCoveragePercentThreshold: 50 }}
         />
-      </View>
-      <View className="px-5 py-10">
-        <AnimatedButton onPress={handleNext} className="bg-primary rounded-lg px-4 py-3">
-          <Text className="text-center font-lemon-milk text-lg text-white">
-            {currentIndex === onboardingData.length - 1 ? "Get Started" : "Next"}
-          </Text>
-        </AnimatedButton>
       </View>
     </View>
   );
