@@ -11,9 +11,24 @@ create table if not exists
     created_at timestamp with time zone default timezone('utc'::text, now()) not null,
     updated_at timestamp with time zone default timezone('utc'::text, now()) not null,
     start_date timestamp with time zone default timezone('utc'::text, now()) not null,
-    end_date timestamp with time zone generated always as (start_date + (duration_days || ' days')::interval) stored,
+    end_date timestamp with time zone,
     status text default 'active' check (status in ('active', 'completed', 'abandoned')) not null
   ) tablespace pg_default;
+
+-- Create trigger to manage end_date
+create or replace function public.calculate_challenge_end_date()
+returns trigger as $$
+begin
+  new.end_date := new.start_date + (new.duration_days || ' days')::interval;
+  return new;
+end;
+$$ language plpgsql;
+
+create trigger set_challenge_end_date
+  before insert or update of start_date, duration_days
+  on public.challenges
+  for each row
+  execute function public.calculate_challenge_end_date();
 
 -- Set up Row Level Security (RLS)
 alter table challenges
