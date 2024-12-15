@@ -53,3 +53,23 @@ create policy "Avatar images are publicly accessible." on storage.objects
 
 -- Add profiles table to powersync publication
 alter publication powersync add table profiles;
+
+
+-- Function to create initial challenge for new profile
+create or replace function create_initial_challenge()
+returns trigger as $$
+begin
+  insert into public.challenges (
+    profile_id, type, duration_days, start_date, status
+  ) values (
+    NEW.id, 'standard', 40, now(), 'active'
+  );
+  return NEW;
+end;
+$$ language plpgsql;
+
+-- Trigger to create challenge after profile creation
+create trigger create_challenge_after_profile
+  after insert on public.profiles
+  for each row
+  execute function create_initial_challenge();

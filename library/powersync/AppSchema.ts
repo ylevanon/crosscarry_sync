@@ -5,6 +5,7 @@ export const TODO_TABLE = "todos";
 export const LIST_TABLE = "lists";
 export const PROFILE_TABLE = "profiles";
 export const CHALLENGES_TABLE = "challenges";
+export const CHALLENGE_DAYS_TABLE = "challenge_days";
 
 export interface ListRecord {
   id: string;
@@ -32,6 +33,16 @@ export interface ChallengeRecord {
   start_date: string;
   end_date: string;
   status: "active" | "completed" | "abandoned";
+}
+
+export interface ChallengeDayRecord {
+  id: string;
+  challenge_id: string;
+  day_number: number;
+  date: string;
+  completed: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface TodoRecord {
@@ -70,6 +81,23 @@ export const AppSchema = new Schema([
       new Column({ name: "start_date", type: ColumnType.TEXT }),
       new Column({ name: "end_date", type: ColumnType.TEXT }),
       new Column({ name: "status", type: ColumnType.TEXT }),
+    ],
+  }),
+  new Table({
+    name: "challenge_days",
+    columns: [
+      new Column({ name: "challenge_id", type: ColumnType.TEXT }),
+      new Column({ name: "day_number", type: ColumnType.INTEGER }),
+      new Column({ name: "date", type: ColumnType.TEXT }),
+      new Column({ name: "completed", type: ColumnType.INTEGER }),
+      new Column({ name: "created_at", type: ColumnType.TEXT }),
+      new Column({ name: "updated_at", type: ColumnType.TEXT }),
+    ],
+    indexes: [
+      new Index({
+        name: "challenge",
+        columns: [new IndexedColumn({ name: "challenge_id" })],
+      }),
     ],
   }),
   new Table({

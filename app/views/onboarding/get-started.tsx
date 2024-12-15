@@ -36,7 +36,7 @@ export default function GetStartedScreen() {
   };
 
   const handleComplete = async () => {
-    await createNewChallenge();
+    // await createNewChallenge();
     router.replace("/views/todos/lists");
   };
 
