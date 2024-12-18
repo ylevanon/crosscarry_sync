@@ -6,6 +6,8 @@ export const LIST_TABLE = "lists";
 export const PROFILE_TABLE = "profiles";
 export const CHALLENGES_TABLE = "challenges";
 export const CHALLENGE_DAYS_TABLE = "challenge_days";
+export const SOBER_TABLE = "sober_table";
+export const DIET_TABLE = "diet_table";
 
 export interface ListRecord {
   id: string;
@@ -57,6 +59,24 @@ export interface TodoRecord {
   list_id: string;
 
   photo_id?: string; // This is the attachment id, 1:1 relationship with `id` in AttachmentTable
+}
+
+export interface SoberEntryRecord {
+  id: string;
+  challenge_days_id: string;
+  challenge_id: string;
+  completed: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DietEntryRecord {
+  id: string;
+  challenge_days_id: string;
+  challenge_id: string;
+  completed: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export const AppSchema = new Schema([
@@ -125,6 +145,28 @@ export const AppSchema = new Schema([
       new Column({ name: "created_at", type: ColumnType.TEXT }),
       new Column({ name: "name", type: ColumnType.TEXT }),
       new Column({ name: "owner_id", type: ColumnType.TEXT }),
+    ],
+  }),
+  new Table({
+    name: SOBER_TABLE,
+    columns: [
+      new Column({ name: "id", type: ColumnType.TEXT }),
+      new Column({ name: "challenge_days_id", type: ColumnType.TEXT }),
+      new Column({ name: "challenge_id", type: ColumnType.TEXT }),
+      new Column({ name: "completed", type: ColumnType.INTEGER }), // boolean is stored as INTEGER in SQLite
+      new Column({ name: "created_at", type: ColumnType.TEXT }),
+      new Column({ name: "updated_at", type: ColumnType.TEXT }),
+    ],
+  }),
+  new Table({
+    name: DIET_TABLE,
+    columns: [
+      new Column({ name: "id", type: ColumnType.TEXT }),
+      new Column({ name: "challenge_days_id", type: ColumnType.TEXT }),
+      new Column({ name: "challenge_id", type: ColumnType.TEXT }),
+      new Column({ name: "completed", type: ColumnType.INTEGER }), // boolean is stored as INTEGER in SQLite
+      new Column({ name: "created_at", type: ColumnType.TEXT }),
+      new Column({ name: "updated_at", type: ColumnType.TEXT }),
     ],
   }),
   // Add Attachment table

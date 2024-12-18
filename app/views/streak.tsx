@@ -1,5 +1,5 @@
 import { useQuery } from "@powersync/react-native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ScrollView, View, Text } from "react-native";
 
 import {
@@ -7,18 +7,21 @@ import {
   CHALLENGE_DAYS_TABLE,
   ChallengeRecord,
   ChallengeDayRecord,
+  SOBER_TABLE,
+  SoberEntryRecord,
+  DIET_TABLE,
+  DietEntryRecord,
 } from "../../library/powersync/AppSchema";
+import { useSystem } from "../../library/powersync/system";
 import { colors } from "../../library/theme/colors";
 import { CardInputWidget } from "../../library/widgets/CardInputWidget";
 import { CheckboxWidget } from "../../library/widgets/CheckboxWidget";
 import { StreakProgressWidget } from "../../library/widgets/StreakProgressWidget";
 
 const StreakView = () => {
-  const [goal, setGoal] = useState("");
-  const [checkedItems, setCheckedItems] = useState({
-    sobriety: false,
-    diet: false,
-  });
+  const system = useSystem();
+  const [sober, setSober] = useState(false);
+  const [diet, setDiet] = useState(false);
   const [inputValues, setInputValues] = useState({
     workout: "",
     service: "",
@@ -44,31 +47,64 @@ const StreakView = () => {
 
   const currentDayNumber = currentDayData?.[0]?.day_number ?? -1; // Default to 1 since we know it's first day
 
-  // Add debug component
-  const DebugInfo = () => (
-    <View style={{ padding: 10, backgroundColor: "#333" }}>
-      <Text style={{ color: "white", fontFamily: "monospace" }}>
-        Active Challenge:{"\n"}
-        {JSON.stringify(activeChallenge, null, 2)}
-      </Text>
-      <Text style={{ color: "white", fontFamily: "monospace", marginTop: 10 }}>
-        Current Day Data:{"\n"}
-        {JSON.stringify(currentDayData, null, 2)}
-      </Text>
-    </View>
+  // Get sober entry and initialize state
+  const { data: soberEntry } = useQuery<SoberEntryRecord>(
+    `SELECT *
+     FROM ${SOBER_TABLE} 
+     WHERE challenge_id = ? 
+     AND challenge_days_id = ?`,
+    [activeChallenge?.id, currentDayData?.[0]?.id]
   );
 
-  // Calculate progress including all tasks
-  const totalTasks = Object.keys(checkedItems).length + Object.keys(inputValues).length + 1; // +1 for goal
-  const completedChecks = Object.values(checkedItems).filter(Boolean).length;
-  const completedInputs = Object.values(inputValues).filter((val) => val.length > 0).length;
-  const completedTasks = completedChecks + completedInputs + (goal.length > 0 ? 1 : 0);
-  const progress = totalTasks > 0 ? completedTasks / totalTasks : 0;
+  // Get diet entry and initialize state
+  const { data: dietEntry } = useQuery<DietEntryRecord>(
+    `SELECT *
+     FROM ${DIET_TABLE} 
+     WHERE challenge_id = ? 
+     AND challenge_days_id = ?`,
+    [activeChallenge?.id, currentDayData?.[0]?.id]
+  );
 
+  useEffect(() => {
+    if (soberEntry?.[0]) {
+      setSober(!!soberEntry[0].completed);
+    }
+    if (dietEntry?.[0]) {
+      setDiet(!!dietEntry[0].completed);
+    }
+  }, [soberEntry, dietEntry]);
+
+  const toggleSobriety = async () => {
+    if (!soberEntry?.[0]?.id) return;
+    const newStatus = !sober;
+    await system.powersync.execute(
+      `UPDATE ${SOBER_TABLE} SET completed = ?, updated_at = datetime('now') WHERE id = ?`,
+      [newStatus ? 1 : 0, soberEntry[0].id]
+    );
+    setSober(newStatus);
+  };
+
+  const toggleDiet = async () => {
+    if (!dietEntry?.[0]?.id) return;
+    const newStatus = !diet;
+    await system.powersync.execute(
+      `UPDATE ${DIET_TABLE} SET completed = ?, updated_at = datetime('now') WHERE id = ?`,
+      [newStatus ? 1 : 0, dietEntry[0].id]
+    );
+    setDiet(newStatus);
+  };
+
+  // Calculate progress including all tasks
+  const totalTasks = 3;
+
+  const completedInputs = Object.values(inputValues).filter((val) => val.length > 0).length;
+  const completedChecks = Number(sober) + Number(diet);
+  const completedTasks = completedChecks + completedInputs;
+  const progress = totalTasks > 0 ? completedTasks / totalTasks : 0;
   return (
     <View className="flex-1 bg-neutral-900">
       <ScrollView className="flex-1 bg-neutral-800 pt-4">
-        <DebugInfo />
+        {/* <DebugInfo /> */}
         <StreakProgressWidget
           streak={currentDayNumber}
           progress={progress}
@@ -80,13 +116,13 @@ const StreakView = () => {
           <CheckboxWidget
             title="No Alcohol, Drugs, or Pornography"
             subtitle="Stay clean and sober"
-            onPress={() => setCheckedItems((prev) => ({ ...prev, sobriety: !prev.sobriety }))}
+            onPress={toggleSobriety}
           />
 
           <CheckboxWidget
             title="Follow a Diet"
             subtitle="Stick to your nutrition plan"
-            onPress={() => setCheckedItems((prev) => ({ ...prev, diet: !prev.diet }))}
+            onPress={toggleDiet}
           />
 
           <CardInputWidget
