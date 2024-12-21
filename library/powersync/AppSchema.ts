@@ -150,7 +150,6 @@ export const AppSchema = new Schema([
   new Table({
     name: SOBER_TABLE,
     columns: [
-      new Column({ name: "id", type: ColumnType.TEXT }),
       new Column({ name: "challenge_days_id", type: ColumnType.TEXT }),
       new Column({ name: "challenge_id", type: ColumnType.TEXT }),
       new Column({ name: "completed", type: ColumnType.INTEGER }), // boolean is stored as INTEGER in SQLite
@@ -161,7 +160,6 @@ export const AppSchema = new Schema([
   new Table({
     name: DIET_TABLE,
     columns: [
-      new Column({ name: "id", type: ColumnType.TEXT }),
       new Column({ name: "challenge_days_id", type: ColumnType.TEXT }),
       new Column({ name: "challenge_id", type: ColumnType.TEXT }),
       new Column({ name: "completed", type: ColumnType.INTEGER }), // boolean is stored as INTEGER in SQLite

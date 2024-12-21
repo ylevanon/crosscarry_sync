@@ -3,9 +3,7 @@ import React, { useState, useEffect } from "react";
 import { ScrollView, View, Text } from "react-native";
 
 import {
-  CHALLENGES_TABLE,
   CHALLENGE_DAYS_TABLE,
-  ChallengeRecord,
   ChallengeDayRecord,
   SOBER_TABLE,
   SoberEntryRecord,
@@ -18,8 +16,12 @@ import { CardInputWidget } from "../../library/widgets/CardInputWidget";
 import { CheckboxWidget } from "../../library/widgets/CheckboxWidget";
 import { StreakProgressWidget } from "../../library/widgets/StreakProgressWidget";
 
+import useActiveChallenge from "~/library/powersync/repositories/challenge";
+import { useCurrentChallengeDay } from "~/library/powersync/repositories/challengeDays";
+
 const StreakView = () => {
   const system = useSystem();
+  const today = new Date().toISOString().split("T")[0];
   const [sober, setSober] = useState(false);
   const [diet, setDiet] = useState(false);
   const [inputValues, setInputValues] = useState({
@@ -28,24 +30,10 @@ const StreakView = () => {
     help: "",
   });
 
-  // Fetch active challenge and its current day
-  const { data: challenges } = useQuery<ChallengeRecord>(
-    `SELECT * FROM ${CHALLENGES_TABLE} WHERE status = 'active' ORDER BY created_at DESC LIMIT 1`
-  );
+  const { activeChallenge } = useActiveChallenge();
+  const { currentDay } = useCurrentChallengeDay(activeChallenge?.id, today);
 
-  const activeChallenge = challenges?.[0];
-
-  // Get current day number (days elapsed since challenge start)
-  const today = new Date().toISOString().split("T")[0]; // Get YYYY-MM-DD
-  const { data: currentDayData } = useQuery<ChallengeDayRecord>(
-    `SELECT *
-     FROM ${CHALLENGE_DAYS_TABLE} 
-     WHERE challenge_id = ? 
-     AND date LIKE ?`,
-    [activeChallenge?.id, `${today}%`]
-  );
-
-  const currentDayNumber = currentDayData?.[0]?.day_number ?? -1; // Default to 1 since we know it's first day
+  const currentDayNumber = currentDay?.day_number; // Default to 1 since we know it's first day
 
   // Get sober entry and initialize state
   const { data: soberEntry } = useQuery<SoberEntryRecord>(
@@ -53,7 +41,7 @@ const StreakView = () => {
      FROM ${SOBER_TABLE} 
      WHERE challenge_id = ? 
      AND challenge_days_id = ?`,
-    [activeChallenge?.id, currentDayData?.[0]?.id]
+    [activeChallenge?.id, currentDay?.id]
   );
 
   // Get diet entry and initialize state
@@ -62,7 +50,7 @@ const StreakView = () => {
      FROM ${DIET_TABLE} 
      WHERE challenge_id = ? 
      AND challenge_days_id = ?`,
-    [activeChallenge?.id, currentDayData?.[0]?.id]
+    [activeChallenge?.id, currentDay?.id]
   );
 
   useEffect(() => {
@@ -117,12 +105,14 @@ const StreakView = () => {
             title="No Alcohol, Drugs, or Pornography"
             subtitle="Stay clean and sober"
             onPress={toggleSobriety}
+            defaultChecked={sober}
           />
 
           <CheckboxWidget
             title="Follow a Diet"
             subtitle="Stick to your nutrition plan"
             onPress={toggleDiet}
+            defaultChecked={diet}
           />
 
           <CardInputWidget

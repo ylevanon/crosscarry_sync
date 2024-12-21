@@ -15,10 +15,16 @@ interface CheckboxWidgetProps {
   title: string;
   subtitle?: string;
   onPress: () => void;
+  defaultChecked?: boolean;
 }
 
-export const CheckboxWidget: React.FC<CheckboxWidgetProps> = ({ title, subtitle, onPress }) => {
-  const [isPressed, setIsPressed] = useState(false);
+export const CheckboxWidget: React.FC<CheckboxWidgetProps> = ({
+  title,
+  subtitle,
+  onPress,
+  defaultChecked,
+}) => {
+  const [isPressed, setIsPressed] = useState(defaultChecked);
   const pressed = useSharedValue(false);
   const scale = useSharedValue(1);
 
