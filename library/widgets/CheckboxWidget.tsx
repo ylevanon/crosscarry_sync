@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -22,11 +22,16 @@ export const CheckboxWidget: React.FC<CheckboxWidgetProps> = ({
   title,
   subtitle,
   onPress,
-  defaultChecked,
+  defaultChecked = false,
 }) => {
   const [isPressed, setIsPressed] = useState(defaultChecked);
-  const pressed = useSharedValue(false);
+  const pressed = useSharedValue(defaultChecked);
   const scale = useSharedValue(1);
+
+  useEffect(() => {
+    setIsPressed(defaultChecked);
+    pressed.value = defaultChecked;
+  }, [defaultChecked]);
 
   const tap = useMemo(
     () =>

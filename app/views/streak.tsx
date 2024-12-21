@@ -1,15 +1,7 @@
-import { useQuery } from "@powersync/react-native";
 import React, { useState, useEffect } from "react";
-import { ScrollView, View, Text } from "react-native";
+import { ScrollView, View } from "react-native";
 
-import {
-  CHALLENGE_DAYS_TABLE,
-  ChallengeDayRecord,
-  SOBER_TABLE,
-  SoberEntryRecord,
-  DIET_TABLE,
-  DietEntryRecord,
-} from "../../library/powersync/AppSchema";
+import { SOBER_TABLE, DIET_TABLE } from "../../library/powersync/AppSchema";
 import { useSystem } from "../../library/powersync/system";
 import { colors } from "../../library/theme/colors";
 import { CardInputWidget } from "../../library/widgets/CardInputWidget";
@@ -18,6 +10,8 @@ import { StreakProgressWidget } from "../../library/widgets/StreakProgressWidget
 
 import useActiveChallenge from "~/library/powersync/repositories/challenge";
 import { useCurrentChallengeDay } from "~/library/powersync/repositories/challengeDays";
+import useDietByChallengeDay from "~/library/powersync/repositories/diet";
+import useSoberByChallengeDay from "~/library/powersync/repositories/sober";
 
 const StreakView = () => {
   const system = useSystem();
@@ -32,52 +26,54 @@ const StreakView = () => {
 
   const { activeChallenge } = useActiveChallenge();
   const { currentDay } = useCurrentChallengeDay(activeChallenge?.id, today);
+  const { dietEntry } = useDietByChallengeDay(currentDay?.id);
+  const { soberEntry } = useSoberByChallengeDay(currentDay?.id);
 
-  const currentDayNumber = currentDay?.day_number; // Default to 1 since we know it's first day
-
-  // Get sober entry and initialize state
-  const { data: soberEntry } = useQuery<SoberEntryRecord>(
-    `SELECT *
-     FROM ${SOBER_TABLE} 
-     WHERE challenge_id = ? 
-     AND challenge_days_id = ?`,
-    [activeChallenge?.id, currentDay?.id]
-  );
+  const currentDayNumber = currentDay?.day_number;
 
   // Get diet entry and initialize state
-  const { data: dietEntry } = useQuery<DietEntryRecord>(
-    `SELECT *
-     FROM ${DIET_TABLE} 
-     WHERE challenge_id = ? 
-     AND challenge_days_id = ?`,
-    [activeChallenge?.id, currentDay?.id]
-  );
+  // const { data: dietEntry } = useQuery<DietEntryRecord>(
+  //   `SELECT *
+  //    FROM ${DIET_TABLE}
+  //    WHERE challenge_id = ?
+  //    AND challenge_days_id = ?`,
+  //   [activeChallenge?.id, currentDay?.id]
+  // );
+
+  // // Get sober entry and initialize state
+  // const { data: soberEntry } = useQuery<SoberEntryRecord>(
+  //   `SELECT *
+  //    FROM ${SOBER_TABLE}
+  //    WHERE challenge_id = ?
+  //    AND challenge_days_id = ?`,
+  //   [activeChallenge?.id, currentDay?.id]
+  // );
 
   useEffect(() => {
-    if (soberEntry?.[0]) {
-      setSober(!!soberEntry[0].completed);
+    if (soberEntry) {
+      setSober(!!soberEntry.completed);
     }
-    if (dietEntry?.[0]) {
-      setDiet(!!dietEntry[0].completed);
+    if (dietEntry) {
+      setDiet(!!dietEntry.completed);
     }
   }, [soberEntry, dietEntry]);
 
   const toggleSobriety = async () => {
-    if (!soberEntry?.[0]?.id) return;
+    if (!soberEntry?.id) return;
     const newStatus = !sober;
     await system.powersync.execute(
       `UPDATE ${SOBER_TABLE} SET completed = ?, updated_at = datetime('now') WHERE id = ?`,
-      [newStatus ? 1 : 0, soberEntry[0].id]
+      [newStatus ? 1 : 0, soberEntry.id]
     );
     setSober(newStatus);
   };
 
   const toggleDiet = async () => {
-    if (!dietEntry?.[0]?.id) return;
+    if (!dietEntry?.id) return;
     const newStatus = !diet;
     await system.powersync.execute(
       `UPDATE ${DIET_TABLE} SET completed = ?, updated_at = datetime('now') WHERE id = ?`,
-      [newStatus ? 1 : 0, dietEntry[0].id]
+      [newStatus ? 1 : 0, dietEntry.id]
     );
     setDiet(newStatus);
   };
@@ -105,14 +101,14 @@ const StreakView = () => {
             title="No Alcohol, Drugs, or Pornography"
             subtitle="Stay clean and sober"
             onPress={toggleSobriety}
-            defaultChecked={sober}
+            defaultChecked={!!soberEntry?.completed}
           />
 
           <CheckboxWidget
-            title="Follow a Diet"
+            title="Diet"
             subtitle="Stick to your nutrition plan"
             onPress={toggleDiet}
-            defaultChecked={diet}
+            defaultChecked={!!dietEntry?.completed}
           />
 
           <CardInputWidget
