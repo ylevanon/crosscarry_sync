@@ -8,6 +8,9 @@ export const CHALLENGES_TABLE = "challenges";
 export const CHALLENGE_DAYS_TABLE = "challenge_days";
 export const SOBER_TABLE = "sober_table";
 export const DIET_TABLE = "diet_table";
+export const HELP_TABLE = "help_table";
+export const SERVICE_TABLE = "service_table";
+export const WORKOUT_TABLE = "workout_table";
 
 export interface ListRecord {
   id: string;
@@ -75,6 +78,36 @@ export interface DietEntryRecord {
   challenge_days_id: string;
   challenge_id: string;
   completed: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface HelpEntryRecord {
+  id: string;
+  challenge_days_id: string;
+  challenge_id: string;
+  completed: boolean;
+  description: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ServiceEntryRecord {
+  id: string;
+  challenge_days_id: string;
+  challenge_id: string;
+  completed: boolean;
+  description: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WorkoutEntryRecord {
+  id: string;
+  challenge_days_id: string;
+  challenge_id: string;
+  completed: boolean;
+  description: string;
   created_at: string;
   updated_at: string;
 }
@@ -163,6 +196,39 @@ export const AppSchema = new Schema([
       new Column({ name: "challenge_days_id", type: ColumnType.TEXT }),
       new Column({ name: "challenge_id", type: ColumnType.TEXT }),
       new Column({ name: "completed", type: ColumnType.INTEGER }), // boolean is stored as INTEGER in SQLite
+      new Column({ name: "created_at", type: ColumnType.TEXT }),
+      new Column({ name: "updated_at", type: ColumnType.TEXT }),
+    ],
+  }),
+  new Table({
+    name: HELP_TABLE,
+    columns: [
+      new Column({ name: "challenge_days_id", type: ColumnType.TEXT }),
+      new Column({ name: "challenge_id", type: ColumnType.TEXT }),
+      new Column({ name: "completed", type: ColumnType.INTEGER }), // boolean is stored as INTEGER in SQLite
+      new Column({ name: "description", type: ColumnType.TEXT }),
+      new Column({ name: "created_at", type: ColumnType.TEXT }),
+      new Column({ name: "updated_at", type: ColumnType.TEXT }),
+    ],
+  }),
+  new Table({
+    name: SERVICE_TABLE,
+    columns: [
+      new Column({ name: "challenge_days_id", type: ColumnType.TEXT }),
+      new Column({ name: "challenge_id", type: ColumnType.TEXT }),
+      new Column({ name: "completed", type: ColumnType.INTEGER }), // boolean is stored as INTEGER in SQLite
+      new Column({ name: "description", type: ColumnType.TEXT }),
+      new Column({ name: "created_at", type: ColumnType.TEXT }),
+      new Column({ name: "updated_at", type: ColumnType.TEXT }),
+    ],
+  }),
+  new Table({
+    name: WORKOUT_TABLE,
+    columns: [
+      new Column({ name: "challenge_days_id", type: ColumnType.TEXT }),
+      new Column({ name: "challenge_id", type: ColumnType.TEXT }),
+      new Column({ name: "completed", type: ColumnType.INTEGER }), // boolean is stored as INTEGER in SQLite
+      new Column({ name: "description", type: ColumnType.TEXT }),
       new Column({ name: "created_at", type: ColumnType.TEXT }),
       new Column({ name: "updated_at", type: ColumnType.TEXT }),
     ],
