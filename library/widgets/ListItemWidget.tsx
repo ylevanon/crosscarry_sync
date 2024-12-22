@@ -1,61 +1,57 @@
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
-import { Alert, View, Text, Pressable } from "react-native";
-import Swipeable from "react-native-gesture-handler/Swipeable";
+import React, { useMemo } from "react";
+import { View, Text } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  runOnJS,
+} from "react-native-reanimated";
 
-export interface ListItemWidgetProps {
-  title: string;
-  description?: string;
-  onPress?: () => void;
-  onDelete?: () => void;
+import { GratitudeItemRecord } from "../powersync/AppSchema";
+import { colors } from "../theme/colors";
+
+interface ListItemWidgetProps {
+  item: GratitudeItemRecord;
+  onRemove: (id: string) => void;
 }
 
-export const ListItemWidget: React.FC<ListItemWidgetProps> = ({
-  title,
-  description,
-  onPress,
-  onDelete,
-}) => {
-  const renderRightActions = () => (
-    <Pressable
-      className="flex-1 justify-center bg-red-500/90 px-4"
-      onPress={() => {
-        Alert.alert(
-          "Confirm",
-          "This list will be permanently deleted",
-          [{ text: "Cancel" }, { text: "Delete", onPress: () => onDelete?.() }],
-          { cancelable: true }
-        );
-      }}
-    >
-      <View className="items-center">
-        <Ionicons name="trash-outline" size={24} color="white" />
-        <Text className="text-white">Delete</Text>
-      </View>
-    </Pressable>
+export const ListItemWidget: React.FC<ListItemWidgetProps> = ({ item, onRemove }) => {
+  const pressed = useSharedValue(false);
+  const scale = useSharedValue(1);
+
+  const tap = useMemo(
+    () =>
+      Gesture.Tap()
+        .onBegin(() => {
+          "worklet";
+          pressed.value = true;
+          scale.value = withSpring(0.95, { damping: 15, stiffness: 400 });
+        })
+        .onFinalize(() => {
+          "worklet";
+          pressed.value = false;
+          scale.value = withSpring(1, { damping: 15, stiffness: 400 });
+          runOnJS(() => onRemove(item.id))();
+        }),
+    [item.id, onRemove, scale, pressed]
   );
 
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
   return (
-    <View className="p-2">
-      <Swipeable renderRightActions={renderRightActions}>
-        <Pressable
-          onPress={onPress}
-          className="flex-row items-center border-b border-gray-200 bg-white p-4"
-        >
-          <View className="mr-3">
-            <Ionicons name="list" size={24} color="gray" />
-          </View>
-
-          <View className="min-h-[80px] flex-1">
-            <Text className="text-lg font-semibold text-gray-900">{title}</Text>
-            {description && <Text className="mt-1 text-sm text-gray-600">{description}</Text>}
-          </View>
-
-          <View className="ml-2">
-            <Ionicons name="chevron-forward" size={24} color="gray" />
-          </View>
-        </Pressable>
-      </Swipeable>
+    <View className="mb-1 flex-row items-center">
+      <Text className="text-sm font-normal" style={{ color: colors.neutral[900] }}>
+        • {item.description}
+      </Text>
+      <GestureDetector gesture={tap}>
+        <Animated.View style={[animatedStyle, { marginLeft: 8 }]}>
+          <Ionicons name="close-circle" size={16} color={colors.neutral[900]} />
+        </Animated.View>
+      </GestureDetector>
     </View>
   );
 };

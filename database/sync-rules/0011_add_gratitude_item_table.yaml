@@ -1,0 +1,62 @@
+bucket_definitions:
+  user_lists:
+    # Separate bucket per todo list
+    parameters: select id as list_id from lists where owner_id = request.user_id()
+    data:
+      - select * from lists where id = bucket.list_id
+      - select * from todos where list_id = bucket.list_id
+
+  user_profile:
+    parameters: select request.user_id() as user_id
+    data:
+      - select * from profiles where bucket.user_id = id
+
+  user_challenges:
+    parameters: select request.user_id() as user_id
+    data:
+      - select * from challenges where profile_id = bucket.user_id
+
+  user_challenge_days:
+    parameters: select id as challenge_id from challenges where profile_id = request.user_id()
+    data:
+      - select * from challenge_days where challenge_id = bucket.challenge_id
+
+  user_sober_entries:
+    parameters: select id as challenge_id from challenges where profile_id = request.user_id()
+    data:
+      - select * from sober_table where challenge_id = bucket.challenge_id
+
+  user_diet_entries:
+    parameters: select id as challenge_id from challenges where profile_id = request.user_id()
+    data:
+      - select * from diet_table where challenge_id = bucket.challenge_id
+
+  user_workout_entries:
+    parameters: select id as challenge_id from challenges where profile_id = request.user_id()
+    data:
+      - select * from workout_table where challenge_id = bucket.challenge_id
+
+  user_service_entries:
+    parameters: select id as challenge_id from challenges where profile_id = request.user_id()
+    data:
+      - select * from service_table where challenge_id = bucket.challenge_id
+
+  user_help_entries:
+    parameters: select id as challenge_id from challenges where profile_id = request.user_id()
+    data:
+      - select * from help_table where challenge_id = bucket.challenge_id
+
+  user_gratitude_entries:
+    parameters: select id as challenge_id from challenges where profile_id = request.user_id()
+    data:
+      - select * from gratitude_table where challenge_id = bucket.challenge_id
+
+  user_gratitude_items_entries:
+    parameters: select id as gratitude_id from gratitude_table where challenge_id = request.user_id()
+    data:
+      - select * from gratitude_item_table where gratitude_id = bucket.gratitude_id
+
+  user_gratitude_items:
+    parameters: select id as gratitude_id from gratitude_table where challenge_id = request.user_id()
+    data:
+      - select * from gratitude_item where gratitude_id = bucket.gratitude_id

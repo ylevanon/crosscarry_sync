@@ -12,6 +12,7 @@ export const HELP_TABLE = "help_table";
 export const SERVICE_TABLE = "service_table";
 export const WORKOUT_TABLE = "workout_table";
 export const GRATITUDE_TABLE = "gratitude_table";
+export const GRATITUDE_ITEM_TABLE = "gratitude_item";
 
 export interface ListRecord {
   id: string;
@@ -117,8 +118,15 @@ export interface GratitudeEntryRecord {
   id: string;
   challenge_days_id: string;
   challenge_id: string;
-  items: string; // This will store the array of gratitude items
   completed: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GratitudeItemRecord {
+  id: string;
+  gratitude_id: string;
+  description: string;
   created_at: string;
   updated_at: string;
 }
@@ -250,7 +258,15 @@ export const AppSchema = new Schema([
       new Column({ name: "challenge_days_id", type: ColumnType.TEXT }),
       new Column({ name: "challenge_id", type: ColumnType.TEXT }),
       new Column({ name: "completed", type: ColumnType.INTEGER }), // boolean is stored as INTEGER in SQLite
-      new Column({ name: "items", type: ColumnType.TEXT }), // PowerSync will store JSONB as text
+      new Column({ name: "created_at", type: ColumnType.TEXT }),
+      new Column({ name: "updated_at", type: ColumnType.TEXT }),
+    ],
+  }),
+  new Table({
+    name: GRATITUDE_ITEM_TABLE,
+    columns: [
+      new Column({ name: "gratitude_id", type: ColumnType.TEXT }),
+      new Column({ name: "description", type: ColumnType.TEXT }),
       new Column({ name: "created_at", type: ColumnType.TEXT }),
       new Column({ name: "updated_at", type: ColumnType.TEXT }),
     ],

@@ -10,17 +10,7 @@ const useGratitudeByChallengeDay = (challengeDayId: string) => {
     [challengeDayId]
   );
 
-  const gratitudeEntry = gratitudeEntries?.[0];
-
-  // Parse items from JSON string to array if it exists
-  const parsedEntry = gratitudeEntry
-    ? {
-        ...gratitudeEntry,
-        items: JSON.parse(gratitudeEntry.items || "[]"),
-      }
-    : null;
-
-  return { gratitudeEntry: parsedEntry };
+  return { gratitudeEntry: gratitudeEntries?.[0] };
 };
 
 export default useGratitudeByChallengeDay;

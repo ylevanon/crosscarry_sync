@@ -1,5 +1,7 @@
+import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useEffect } from "react";
-import { ScrollView, View } from "react-native";
+import { ScrollView, View, Pressable, Text } from "react-native";
+import prompt from "react-native-prompt-android";
 
 import {
   SOBER_TABLE,
@@ -7,23 +9,25 @@ import {
   WORKOUT_TABLE,
   HELP_TABLE,
   SERVICE_TABLE,
-  GRATITUDE_TABLE,
+  GRATITUDE_ITEM_TABLE,
 } from "../../library/powersync/AppSchema";
 import { useSystem } from "../../library/powersync/system";
 import { colors } from "../../library/theme/colors";
 import { StreakProgressWidget } from "../../library/widgets/StreakProgressWidget";
 
+import { GratitudeItemRecord } from "~/library/powersync/AppSchema";
 import useActiveChallenge from "~/library/powersync/repositories/challenge";
 import { useCurrentChallengeDay } from "~/library/powersync/repositories/challengeDays";
 import useDietByChallengeDay from "~/library/powersync/repositories/diet";
 import useGratitudeByChallengeDay from "~/library/powersync/repositories/gratitude";
+import useGratitudeItemsByGratitudeId from "~/library/powersync/repositories/gratitudeItem";
 import useHelpByChallengeDay from "~/library/powersync/repositories/help";
 import useServiceByChallengeDay from "~/library/powersync/repositories/service";
 import useSoberByChallengeDay from "~/library/powersync/repositories/sober";
 import useWorkoutByChallengeDay from "~/library/powersync/repositories/workout";
 import { CardInputWidget } from "~/library/widgets/CardInputWidget";
 import { CheckboxWidget } from "~/library/widgets/CheckboxWidget";
-import { ListWidget } from "~/library/widgets/ListWidget";
+import { ListItemWidget } from "~/library/widgets/ListItemWidget";
 
 const StreakView = () => {
   const system = useSystem();
@@ -36,7 +40,7 @@ const StreakView = () => {
   const [workout, setWorkout] = useState("");
   const [help, setHelp] = useState("");
   const [service, setService] = useState("");
-  const [gratitudeItems, setGratitudeItems] = useState<string[]>([]);
+  const [gratitudeItems, setGratitudeItems] = useState<GratitudeItemRecord[]>([]);
 
   const { activeChallenge } = useActiveChallenge();
   const { currentDay } = useCurrentChallengeDay(activeChallenge?.id, today);
@@ -46,6 +50,8 @@ const StreakView = () => {
   const { helpEntry } = useHelpByChallengeDay(currentDay?.id);
   const { serviceEntry } = useServiceByChallengeDay(currentDay?.id);
   const { gratitudeEntry } = useGratitudeByChallengeDay(currentDay?.id);
+  const { gratitudeItemEntries } = useGratitudeItemsByGratitudeId(gratitudeEntry?.id);
+
   const currentDayNumber = currentDay?.day_number;
 
   useEffect(() => {
@@ -55,14 +61,14 @@ const StreakView = () => {
     setWorkout(workoutEntry?.description || "");
     setHelp(helpEntry?.description || "");
     setService(serviceEntry?.description || "");
-    setGratitudeItems(gratitudeEntry?.items);
+    setGratitudeItems(gratitudeItemEntries);
   }, [
     soberEntry?.id,
     dietEntry?.id,
     workoutEntry?.id,
     helpEntry?.id,
     serviceEntry?.id,
-    gratitudeEntry?.id,
+    gratitudeItemEntries,
   ]);
 
   const toggleSobriety = async () => {
@@ -112,18 +118,21 @@ const StreakView = () => {
     setService(text);
   };
 
-  const updateGratitudeItems = async (items: string[]) => {
+  const addGratitudeItem = async (description: string) => {
     if (!gratitudeEntry?.id) return;
-    const itemsJson = JSON.stringify(items);
     await system.powersync.execute(
-      `UPDATE ${GRATITUDE_TABLE} SET items = ?, completed = ?, updated_at = datetime('now') WHERE id = ?`,
-      [itemsJson, items.length > 0, gratitudeEntry.id]
+      `INSERT INTO ${GRATITUDE_ITEM_TABLE} (id, gratitude_id, description, created_at, updated_at) 
+       VALUES (uuid(), ?, ?, datetime('now'), datetime('now'))`,
+      [gratitudeEntry.id, description]
     );
-    setGratitudeItems(items);
+  };
+
+  const removeGratitudeItem = async (itemId: string) => {
+    await system.powersync.execute(`DELETE FROM ${GRATITUDE_ITEM_TABLE} WHERE id = ?`, [itemId]);
   };
 
   // Calculate progress including all tasks
-  const totalTasks = 4;
+  const totalTasks = 5;
 
   // const completedInputs = Object.values(inputValues).filter((val) => val.length > 0).length;
   const completedChecks = Number(sober) + Number(diet) + Number(workout);
@@ -179,13 +188,62 @@ const StreakView = () => {
               onChangeText={updateServiceDescription}
             />
 
-            <ListWidget
-              title="Gratitude"
-              subtitle="What are you grateful for today?"
-              items={gratitudeItems}
-              onUpdateItems={updateGratitudeItems}
-              completed={gratitudeItems.length > 0}
-            />
+            <View className="mx-4 mt-6">
+              <View
+                className="rounded-xl p-4"
+                style={{
+                  backgroundColor:
+                    gratitudeItems.length > 0 ? colors.achievement.gold : colors.neutral[700],
+                }}
+              >
+                <View className="flex-row items-center justify-between">
+                  <View className="flex-1">
+                    <Text
+                      className="mb-1 font-['LemonMilkMedium'] text-xl"
+                      style={{
+                        color:
+                          gratitudeItems.length > 0 ? colors.neutral[900] : colors.neutral[100],
+                      }}
+                    >
+                      Gratitude
+                    </Text>
+                    <Text
+                      style={{
+                        color:
+                          gratitudeItems.length > 0 ? colors.neutral[900] : colors.neutral[400],
+                      }}
+                    >
+                      What are you grateful for today?
+                    </Text>
+                    {gratitudeItems.map((item) => (
+                      <ListItemWidget key={item.id} item={item} onRemove={removeGratitudeItem} />
+                    ))}
+                  </View>
+                  <Pressable
+                    onPress={() => {
+                      prompt(
+                        "Gratitude",
+                        "What are you grateful for?",
+                        (text) => {
+                          if (text && text.trim()) {
+                            addGratitudeItem(text.trim());
+                          }
+                        },
+                        {
+                          type: "plain-text",
+                        }
+                      );
+                    }}
+                  >
+                    <Ionicons
+                      name="add-circle"
+                      size={24}
+                      color={gratitudeItems.length > 0 ? colors.neutral[900] : colors.neutral[400]}
+                    />
+                  </Pressable>
+                </View>
+              </View>
+            </View>
           </View>
         </View>
       </ScrollView>
