@@ -83,10 +83,9 @@ export const CardInputWidget: React.FC<CardInputWidgetProps> = ({
       <GestureDetector gesture={tap}>
         <Animated.View style={animatedStyle}>
           <View
+            className="rounded-xl p-4"
             style={{
               backgroundColor: hasValue ? colors.achievement.gold : colors.neutral[700],
-              borderRadius: 12,
-              padding: 16,
             }}
           >
             <View className="flex-row items-center justify-between">
@@ -94,47 +93,20 @@ export const CardInputWidget: React.FC<CardInputWidgetProps> = ({
                 {hasValue ? (
                   <>
                     <Text
-                      style={{
-                        fontFamily: "LemonMilkMedium",
-                        fontSize: 14,
-                        color: colors.neutral[900],
-                        marginBottom: 4,
-                      }}
+                      className="mb-1 font-['LemonMilkMedium'] text-xl"
+                      style={{ color: colors.neutral[900] }}
                     >
                       {title}
                     </Text>
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        fontWeight: "400",
-                        color: colors.neutral[900],
-                      }}
-                    >
+                    <Text className="text-sm font-normal" style={{ color: colors.neutral[900] }}>
                       {value || defaultValue || ""}
                     </Text>
                   </>
                 ) : (
-                  <>
-                    <Text
-                      style={{
-                        fontFamily: "LemonMilkMedium",
-                        fontSize: 20,
-                        color: "#fff",
-                        marginBottom: subtitle ? 2 : 0,
-                      }}
-                    >
-                      {title}
-                    </Text>
-                    {subtitle && (
-                      <Text
-                        style={{
-                          color: colors.neutral[400],
-                        }}
-                      >
-                        {subtitle}
-                      </Text>
-                    )}
-                  </>
+                  <Text className="mb-0.5 font-['LemonMilkMedium'] text-lg">{title}</Text>
+                )}
+                {subtitle && !hasValue && (
+                  <Text style={{ color: colors.neutral[400] }}>{subtitle}</Text>
                 )}
               </View>
               <Ionicons
