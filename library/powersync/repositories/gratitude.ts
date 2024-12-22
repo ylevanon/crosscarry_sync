@@ -16,7 +16,9 @@ const useGratitudeByChallengeDay = (challengeDayId: string) => {
   const parsedEntry = gratitudeEntry
     ? {
         ...gratitudeEntry,
-        items: JSON.parse(gratitudeEntry.items || "[]"),
+        items: Array.isArray(JSON.parse(gratitudeEntry.items || "[]"))
+          ? JSON.parse(gratitudeEntry.items || "[]")
+          : [],
       }
     : null;
 

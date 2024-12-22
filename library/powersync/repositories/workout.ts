@@ -7,13 +7,14 @@ const useWorkoutByChallengeDay = (challengeDayId: string) => {
 
   const { data: workoutEntries } = useQuery<WorkoutEntryRecord>(
     `SELECT *
-   FROM ${WORKOUT_TABLE} WHERE challenge_days_id = ?`,
+     FROM ${WORKOUT_TABLE} 
+     WHERE challenge_days_id = ?
+     ORDER BY updated_at DESC 
+     LIMIT 1`,
     [challengeDayId]
   );
 
-  const workoutEntry = workoutEntries?.[0];
-
-  return { workoutEntry };
+  return { workoutEntry: workoutEntries?.[0] || null };
 };
 
 export default useWorkoutByChallengeDay;

@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import { Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -22,9 +22,8 @@ export const CheckboxWidget: React.FC<CheckboxWidgetProps> = ({
   title,
   subtitle,
   onPress,
-  defaultChecked,
+  defaultChecked = false,
 }) => {
-  const [isPressed, setIsPressed] = useState(defaultChecked);
   const pressed = useSharedValue(false);
   const scale = useSharedValue(1);
 
@@ -40,10 +39,9 @@ export const CheckboxWidget: React.FC<CheckboxWidgetProps> = ({
           "worklet";
           pressed.value = false;
           scale.value = withSpring(1, { damping: 15, stiffness: 400 });
-          runOnJS(setIsPressed)(!isPressed);
           runOnJS(onPress)();
         }),
-    [onPress, scale, pressed, isPressed]
+    [onPress, scale, pressed]
   );
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -51,32 +49,27 @@ export const CheckboxWidget: React.FC<CheckboxWidgetProps> = ({
   }));
 
   return (
-    <View className="mx-4 my-1">
+    <View className="mx-4 mt-6">
       <GestureDetector gesture={tap}>
         <Animated.View style={animatedStyle}>
           <View
+            className="rounded-xl p-4"
             style={{
-              backgroundColor: isPressed ? colors.achievement.gold : colors.neutral[700],
-              borderRadius: 12,
-              padding: 16,
+              backgroundColor: defaultChecked ? colors.achievement.gold : colors.neutral[700],
             }}
           >
             <View className="flex-row items-center justify-between">
               <View>
                 <Text
-                  style={{
-                    fontFamily: "LemonMilkMedium",
-                    fontSize: 20,
-                    color: isPressed ? colors.neutral[900] : "#fff",
-                  }}
+                  className="mb-0.5 font-['LemonMilkMedium'] text-lg"
+                  style={{ color: defaultChecked ? colors.neutral[900] : colors.neutral[100] }}
                 >
                   {title}
                 </Text>
                 {subtitle && (
                   <Text
                     style={{
-                      color: isPressed ? colors.neutral[800] : colors.neutral[400],
-                      marginTop: 2,
+                      color: defaultChecked ? colors.neutral[900] : colors.neutral[400],
                     }}
                   >
                     {subtitle}
@@ -84,9 +77,9 @@ export const CheckboxWidget: React.FC<CheckboxWidgetProps> = ({
                 )}
               </View>
               <Ionicons
-                name={isPressed ? "checkmark-circle" : "checkmark-circle-outline"}
+                name={defaultChecked ? "checkmark-circle" : "checkmark-circle-outline"}
                 size={24}
-                color={isPressed ? colors.neutral[900] : colors.neutral[500]}
+                color={defaultChecked ? colors.neutral[900] : colors.neutral[400]}
               />
             </View>
           </View>
