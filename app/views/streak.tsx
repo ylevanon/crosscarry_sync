@@ -20,7 +20,9 @@ import useActiveChallenge from "~/library/powersync/repositories/challenge";
 import { useCurrentChallengeDay } from "~/library/powersync/repositories/challengeDays";
 import useDietByChallengeDay from "~/library/powersync/repositories/diet";
 import useGratitudeByChallengeDay from "~/library/powersync/repositories/gratitude";
-import useGratitudeItemsByGratitudeId from "~/library/powersync/repositories/gratitudeItem";
+import useGratitudeItemsByGratitudeId, {
+  useGratitudeItems,
+} from "~/library/powersync/repositories/gratitudeItem";
 import useHelpByChallengeDay from "~/library/powersync/repositories/help";
 import useServiceByChallengeDay from "~/library/powersync/repositories/service";
 import useSoberByChallengeDay from "~/library/powersync/repositories/sober";
@@ -50,8 +52,7 @@ const StreakView = () => {
   const { helpEntry } = useHelpByChallengeDay(currentDay?.id);
   const { serviceEntry } = useServiceByChallengeDay(currentDay?.id);
   const { gratitudeEntry } = useGratitudeByChallengeDay(currentDay?.id);
-  const { gratitudeItemEntries } = useGratitudeItemsByGratitudeId(gratitudeEntry?.id);
-
+  const { gratitudeItemEntries } = useGratitudeItems();
   const currentDayNumber = currentDay?.day_number;
 
   useEffect(() => {
@@ -120,11 +121,24 @@ const StreakView = () => {
 
   const addGratitudeItem = async (description: string) => {
     if (!gratitudeEntry?.id) return;
-    await system.powersync.execute(
-      `INSERT INTO ${GRATITUDE_ITEM_TABLE} (id, gratitude_id, description, created_at, updated_at) 
-       VALUES (uuid(), ?, ?, datetime('now'), datetime('now'))`,
-      [gratitudeEntry.id, description]
-    );
+
+    try {
+      const res = await system.powersync.execute(
+        `INSERT INTO ${GRATITUDE_ITEM_TABLE} (id, gratitude_id, description, created_at, updated_at) 
+         VALUES (uuid(), ?, ?, datetime('now'), datetime('now')) RETURNING *`,
+        [gratitudeEntry.id, description]
+      );
+
+      const resultRecord = res.rows?.item(0);
+      if (!resultRecord) {
+        throw new Error("Could not create gratitude item");
+      }
+
+      // Update local state
+      setGratitudeItems((prev) => [...prev, resultRecord]);
+    } catch (error) {
+      console.error("Error adding gratitude item:", error);
+    }
   };
 
   const removeGratitudeItem = async (itemId: string) => {
@@ -215,9 +229,6 @@ const StreakView = () => {
                     >
                       What are you grateful for today?
                     </Text>
-                    {gratitudeItems.map((item) => (
-                      <ListItemWidget key={item.id} item={item} onRemove={removeGratitudeItem} />
-                    ))}
                   </View>
                   <Pressable
                     onPress={() => {
@@ -245,6 +256,10 @@ const StreakView = () => {
               </View>
             </View>
           </View>
+
+          {gratitudeItems.map((item) => (
+            <ListItemWidget key={item.id} item={item} onRemove={removeGratitudeItem} />
+          ))}
         </View>
       </ScrollView>
     </View>

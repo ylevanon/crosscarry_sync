@@ -43,13 +43,22 @@ export const ListItemWidget: React.FC<ListItemWidgetProps> = ({ item, onRemove }
   }));
 
   return (
-    <View className="mb-1 flex-row items-center">
-      <Text className="text-sm font-normal" style={{ color: colors.neutral[900] }}>
-        • {item.description}
-      </Text>
+    <View className="mx-4 mt-6">
       <GestureDetector gesture={tap}>
-        <Animated.View style={[animatedStyle, { marginLeft: 8 }]}>
-          <Ionicons name="close-circle" size={16} color={colors.neutral[900]} />
+        <Animated.View style={animatedStyle}>
+          <View
+            className="rounded-xl p-4"
+            style={{
+              backgroundColor: colors.achievement.gold,
+            }}
+          >
+            <View className="flex-row items-center justify-between">
+              <Text className="text-sm font-normal" style={{ color: colors.neutral[100] }}>
+                • {item.description}
+              </Text>
+              <Ionicons name="close-circle" size={20} color={colors.neutral[400]} />
+            </View>
+          </View>
         </Animated.View>
       </GestureDetector>
     </View>

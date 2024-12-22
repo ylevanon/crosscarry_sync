@@ -2,6 +2,7 @@
 create table if not exists public.gratitude_item (
     id uuid primary key default gen_random_uuid(),
     gratitude_id uuid not null references public.gratitude_table(id),
+    challenge_id uuid not null references public.challenges(id),
     description text not null,
     created_at timestamptz default now(),
     updated_at timestamptz default now()
@@ -15,17 +16,15 @@ alter table public.gratitude_item enable row level security;
 
 -- policy 1: select policy
 -- this policy controls who can view gratitude items
--- it checks if the user owns the challenge through the profile_id
+-- it checks if the user owns the challenge directly through challenge_id
 create policy "Users can view own gratitude items"
     on public.gratitude_item
     for select
     using (
         exists (
             select 1
-            from public.gratitude_table g
-            join public.challenge_days cd on cd.id = g.challenge_days_id
-            join public.challenges c on c.id = cd.challenge_id
-            where g.id = gratitude_item.gratitude_id
+            from public.challenges c
+            where c.id = gratitude_item.challenge_id
             and c.profile_id = auth.uid()
         )
     );
@@ -38,10 +37,8 @@ create policy "Users can insert own gratitude items"
     with check (
         exists (
             select 1
-            from public.gratitude_table g
-            join public.challenge_days cd on cd.id = g.challenge_days_id
-            join public.challenges c on c.id = cd.challenge_id
-            where g.id = gratitude_item.gratitude_id
+            from public.challenges c
+            where c.id = gratitude_item.challenge_id
             and c.profile_id = auth.uid()
         )
     );
@@ -54,10 +51,8 @@ create policy "Users can update own gratitude items"
     using (
         exists (
             select 1
-            from public.gratitude_table g
-            join public.challenge_days cd on cd.id = g.challenge_days_id
-            join public.challenges c on c.id = cd.challenge_id
-            where g.id = gratitude_item.gratitude_id
+            from public.challenges c
+            where c.id = gratitude_item.challenge_id
             and c.profile_id = auth.uid()
         )
     );
@@ -70,10 +65,8 @@ create policy "Users can delete own gratitude items"
     using (
         exists (
             select 1
-            from public.gratitude_table g
-            join public.challenge_days cd on cd.id = g.challenge_days_id
-            join public.challenges c on c.id = cd.challenge_id
-            where g.id = gratitude_item.gratitude_id
+            from public.challenges c
+            where c.id = gratitude_item.challenge_id
             and c.profile_id = auth.uid()
         )
     );

@@ -126,6 +126,7 @@ export interface GratitudeEntryRecord {
 export interface GratitudeItemRecord {
   id: string;
   gratitude_id: string;
+  challenge_id: string;
   description: string;
   created_at: string;
   updated_at: string;
@@ -266,6 +267,7 @@ export const AppSchema = new Schema([
     name: GRATITUDE_ITEM_TABLE,
     columns: [
       new Column({ name: "gratitude_id", type: ColumnType.TEXT }),
+      new Column({ name: "challenge_id", type: ColumnType.TEXT }),
       new Column({ name: "description", type: ColumnType.TEXT }),
       new Column({ name: "created_at", type: ColumnType.TEXT }),
       new Column({ name: "updated_at", type: ColumnType.TEXT }),
