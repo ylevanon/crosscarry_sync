@@ -50,7 +50,7 @@ export const StreakProgressWidget: React.FC<StreakProgressWidgetProps> = ({
       <View className="flex-1 justify-center pr-4">
         <View className="flex-row items-center">
           <Ionicons name="flame" size={24} color="#4B5563" />
-          <Text className="ml-2 text-2xl font-bold text-gray-900">{streak} Days</Text>
+          <Text className="ml-2 text-2xl font-bold text-gray-900">Day {streak}</Text>
         </View>
         <Text className="mt-2 text-base text-gray-600">
           {completedTasks}/{totalTasks} Tasks Complete

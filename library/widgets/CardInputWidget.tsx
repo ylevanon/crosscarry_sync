@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { View, Text, Pressable } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import prompt from "react-native-prompt-android";
@@ -16,7 +16,8 @@ interface CardInputWidgetProps {
   title: string;
   subtitle?: string;
   placeholder?: string;
-  value: string;
+  value?: string;
+  defaultValue?: string;
   onChangeText: (text: string) => void;
 }
 
@@ -25,10 +26,18 @@ export const CardInputWidget: React.FC<CardInputWidgetProps> = ({
   subtitle,
   placeholder,
   value,
+  defaultValue = "",
   onChangeText,
 }) => {
   const [isPressed, setIsPressed] = useState(false);
   const scale = useSharedValue(1);
+
+  useEffect(() => {
+    if (defaultValue) {
+      onChangeText(defaultValue);
+      setIsPressed(true);
+    }
+  }, [defaultValue]);
 
   const showPrompt = () => {
     prompt(
@@ -42,7 +51,7 @@ export const CardInputWidget: React.FC<CardInputWidgetProps> = ({
       },
       {
         placeholder: placeholder || "Enter text...",
-        defaultValue: value,
+        defaultValue: value || defaultValue,
         style: "shimo",
       }
     );
@@ -67,7 +76,7 @@ export const CardInputWidget: React.FC<CardInputWidgetProps> = ({
     transform: [{ scale: scale.value }],
   }));
 
-  const hasValue = value.length > 0;
+  const hasValue = Boolean(value || defaultValue);
 
   return (
     <View className="mx-4 mt-6">
@@ -96,11 +105,12 @@ export const CardInputWidget: React.FC<CardInputWidgetProps> = ({
                     </Text>
                     <Text
                       style={{
-                        fontSize: 16,
+                        fontSize: 14,
+                        fontWeight: "400",
                         color: colors.neutral[900],
                       }}
                     >
-                      {value}
+                      {value || defaultValue || ""}
                     </Text>
                   </>
                 ) : (
