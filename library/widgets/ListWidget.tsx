@@ -32,7 +32,7 @@ export const ListWidget: React.FC<ListWidgetProps> = ({
   onToggleComplete,
 }) => {
   const scale = useSharedValue(1);
-  const itemsArray = Array.isArray(items) ? items : [];
+  const safeItems = items || [];
 
   const handlePress = () => {
     prompt(
@@ -44,7 +44,7 @@ export const ListWidget: React.FC<ListWidgetProps> = ({
           text: "OK",
           onPress: (text) => {
             if (text && text.trim()) {
-              onUpdateItems([...itemsArray, text.trim()]);
+              onUpdateItems([...safeItems, text.trim()]);
             }
           },
         },
@@ -75,7 +75,7 @@ export const ListWidget: React.FC<ListWidgetProps> = ({
   }));
 
   const handleRemoveItem = (index: number) => {
-    const newItems = [...itemsArray];
+    const newItems = [...safeItems];
     newItems.splice(index, 1);
     onUpdateItems(newItems);
   };
@@ -92,7 +92,7 @@ export const ListWidget: React.FC<ListWidgetProps> = ({
           >
             <View className="flex-row items-center justify-between">
               <View>
-                {itemsArray.length > 0 ? (
+                {safeItems.length > 0 ? (
                   <>
                     <Text
                       className="mb-1 font-['LemonMilkMedium'] text-xl"
@@ -100,7 +100,7 @@ export const ListWidget: React.FC<ListWidgetProps> = ({
                     >
                       {title}
                     </Text>
-                    {itemsArray.map((item, index) => (
+                    {safeItems.map((item, index) => (
                       <View key={index} className="mb-1 flex-row items-center">
                         <Text
                           className="text-sm font-normal"
@@ -122,10 +122,10 @@ export const ListWidget: React.FC<ListWidgetProps> = ({
                 )}
               </View>
               <Ionicons
-                name={itemsArray.length > 0 ? "checkmark-circle" : "add-circle"}
+                name={safeItems.length > 0 ? "checkmark-circle" : "add-circle"}
                 size={24}
-                color={itemsArray.length > 0 ? colors.neutral[900] : colors.neutral[400]}
-                onPress={itemsArray.length > 0 ? onToggleComplete : handlePress}
+                color={safeItems.length > 0 ? colors.neutral[900] : colors.neutral[400]}
+                onPress={safeItems.length > 0 ? onToggleComplete : handlePress}
               />
             </View>
           </View>

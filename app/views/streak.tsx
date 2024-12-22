@@ -55,7 +55,7 @@ const StreakView = () => {
     setWorkout(workoutEntry?.description || "");
     setHelp(helpEntry?.description || "");
     setService(serviceEntry?.description || "");
-    setGratitudeItems(gratitudeEntry?.items || []);
+    setGratitudeItems(gratitudeEntry?.items);
   }, [
     soberEntry?.id,
     dietEntry?.id,
