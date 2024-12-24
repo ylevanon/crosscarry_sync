@@ -137,6 +137,7 @@ export const AppSchema = new Schema([
     name: "profiles",
     columns: [
       new Column({ name: "updated_at", type: ColumnType.TEXT }),
+      new Column({ name: "photo_id", type: ColumnType.TEXT }),
       new Column({ name: "username", type: ColumnType.TEXT }),
       new Column({ name: "full_name", type: ColumnType.TEXT }),
       new Column({ name: "avatar_url", type: ColumnType.TEXT }),
