@@ -49,9 +49,9 @@ bucket_definitions:
   user_gratitude_entries:
     parameters: select id as challenge_id from challenges where profile_id = request.user_id()
     data:
-      - select * from gratitude_table where challenge_days_id = bucket.challenge_id
+      - select * from gratitude_table where challenge_id = bucket.challenge_id
 
   user_gratitude_items:
     parameters: select id as challenge_id from challenges where profile_id = request.user_id()
     data:
-      - select * from gratitude_item where gratitude_id = bucket.challenge_id
+      - select * from gratitude_item where challenge_id = bucket.challenge_id

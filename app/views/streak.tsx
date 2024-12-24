@@ -20,8 +20,9 @@ import useActiveChallenge from "~/library/powersync/repositories/challenge";
 import { useCurrentChallengeDay } from "~/library/powersync/repositories/challengeDays";
 import useDietByChallengeDay from "~/library/powersync/repositories/diet";
 import useGratitudeByChallengeDay from "~/library/powersync/repositories/gratitude";
-import useGratitudeItemsByGratitudeId, {
+import {
   useGratitudeItems,
+  useGratitudeItemsByGratitudeId,
 } from "~/library/powersync/repositories/gratitudeItem";
 import useHelpByChallengeDay from "~/library/powersync/repositories/help";
 import useServiceByChallengeDay from "~/library/powersync/repositories/service";
@@ -52,7 +53,7 @@ const StreakView = () => {
   const { helpEntry } = useHelpByChallengeDay(currentDay?.id);
   const { serviceEntry } = useServiceByChallengeDay(currentDay?.id);
   const { gratitudeEntry } = useGratitudeByChallengeDay(currentDay?.id);
-  const { gratitudeItemEntries } = useGratitudeItems();
+  const { gratitudeItemEntries } = useGratitudeItemsByGratitudeId(gratitudeEntry?.id);
   const currentDayNumber = currentDay?.day_number;
 
   useEffect(() => {
@@ -120,13 +121,13 @@ const StreakView = () => {
   };
 
   const addGratitudeItem = async (description: string) => {
-    if (!gratitudeEntry?.id) return;
+    if (!gratitudeEntry?.id || !activeChallenge?.id) return;
 
     try {
       const res = await system.powersync.execute(
-        `INSERT INTO ${GRATITUDE_ITEM_TABLE} (id, gratitude_id, description, created_at, updated_at) 
-         VALUES (uuid(), ?, ?, datetime('now'), datetime('now')) RETURNING *`,
-        [gratitudeEntry.id, description]
+        `INSERT INTO ${GRATITUDE_ITEM_TABLE} (id, gratitude_id, challenge_id, description, created_at, updated_at) 
+         VALUES (uuid(), ?, ?, ?, datetime('now'), datetime('now')) RETURNING *`,
+        [gratitudeEntry.id, activeChallenge.id, description]
       );
 
       const resultRecord = res.rows?.item(0);
