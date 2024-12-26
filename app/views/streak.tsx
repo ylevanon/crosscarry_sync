@@ -21,10 +21,7 @@ import useActiveChallenge from "~/library/powersync/repositories/challenge";
 import { useCurrentChallengeDay } from "~/library/powersync/repositories/challengeDays";
 import useDietByChallengeDay from "~/library/powersync/repositories/diet";
 import useGratitudeByChallengeDay from "~/library/powersync/repositories/gratitude";
-import {
-  useGratitudeItems,
-  useGratitudeItemsByGratitudeId,
-} from "~/library/powersync/repositories/gratitudeItem";
+import { useGratitudeItemsByGratitudeId } from "~/library/powersync/repositories/gratitudeItem";
 import useHelpByChallengeDay from "~/library/powersync/repositories/help";
 import useServiceByChallengeDay from "~/library/powersync/repositories/service";
 import useSoberByChallengeDay from "~/library/powersync/repositories/sober";
@@ -156,7 +153,7 @@ const StreakView = () => {
 
       // Create streak photo entry
       await system.powersync.execute(
-        `INSERT INTO ${STREAK_PHOTO_TABLE} (challenge_days_id, challenge_id, photo_id) VALUES (?, ?, ?)`,
+        `INSERT INTO ${STREAK_PHOTO_TABLE} (challenge_days_id, challenge_id, photo_id,) VALUES (?, ?, ?)`,
         [currentDay.id, activeChallenge.id, photoId]
       );
     } catch (error) {
