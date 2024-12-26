@@ -10,6 +10,7 @@ import {
   HELP_TABLE,
   SERVICE_TABLE,
   GRATITUDE_ITEM_TABLE,
+  STREAK_PHOTO_TABLE,
 } from "../../library/powersync/AppSchema";
 import { useSystem } from "../../library/powersync/system";
 import { colors } from "../../library/theme/colors";
@@ -31,6 +32,7 @@ import useWorkoutByChallengeDay from "~/library/powersync/repositories/workout";
 import { CardInputWidget } from "~/library/widgets/CardInputWidget";
 import { CheckboxWidget } from "~/library/widgets/CheckboxWidget";
 import { ListItemWidget } from "~/library/widgets/ListItemWidget";
+import { PhotoPickerWidget } from "~/library/widgets/PhotoPickerWidget";
 
 const StreakView = () => {
   const system = useSystem();
@@ -146,6 +148,22 @@ const StreakView = () => {
     await system.powersync.execute(`DELETE FROM ${GRATITUDE_ITEM_TABLE} WHERE id = ?`, [itemId]);
   };
 
+  const handlePhotoSelected = async (base64: string) => {
+    if (!activeChallenge?.id || !currentDay?.id) return;
+    try {
+      // Save photo to attachment queue
+      const { id: photoId } = await system.attachmentQueue!.savePhoto(base64);
+
+      // Create streak photo entry
+      await system.powersync.execute(
+        `INSERT INTO ${STREAK_PHOTO_TABLE} (challenge_days_id, challenge_id, photo_id) VALUES (?, ?, ?)`,
+        [currentDay.id, activeChallenge.id, photoId]
+      );
+    } catch (error) {
+      console.error("Error saving streak photo:", error);
+    }
+  };
+
   // Calculate progress including all tasks
   const totalTasks = 5;
 
@@ -165,6 +183,12 @@ const StreakView = () => {
           />
 
           <View className="mt-6">
+            <PhotoPickerWidget
+              title="Add Photo"
+              subtitle="Document your progress"
+              onPhotoSelected={handlePhotoSelected}
+            />
+
             <CheckboxWidget
               title="No Alcohol, Drugs, or Pornography"
               subtitle="Stay clean and sober"

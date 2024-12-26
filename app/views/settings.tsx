@@ -121,18 +121,30 @@ const SettingsView = () => {
           {/* Profile Section */}
           <View className="m-4 rounded-lg bg-neutral-800 p-4">
             <View className="mb-4 items-center">
-              <Pressable onPress={handlePhotoPress}>
-                {photoAttachment?.local_uri ? (
-                  <Image
-                    source={{ uri: photoAttachment.local_uri }}
-                    className="h-20 w-20 rounded-full"
-                  />
-                ) : (
-                  <View className="h-20 w-20 items-center justify-center rounded-full bg-neutral-700">
+              <View className="relative">
+                <View
+                  className={
+                    photoAttachment?.local_uri
+                      ? "h-20 w-20"
+                      : "h-20 w-20 items-center justify-center rounded-full bg-neutral-700"
+                  }
+                >
+                  {photoAttachment?.local_uri ? (
+                    <Image
+                      source={{ uri: photoAttachment.local_uri }}
+                      className="h-20 w-20 rounded-full"
+                    />
+                  ) : (
                     <Ionicons name="person" size={40} color="#DC1E1E" />
-                  </View>
-                )}
-              </Pressable>
+                  )}
+                </View>
+                <Pressable
+                  onPress={handlePhotoPress}
+                  className="absolute bottom-0 right-0 rounded-full bg-neutral-700 p-1.5"
+                >
+                  <Ionicons name="pencil" size={16} color="#DC1E1E" />
+                </Pressable>
+              </View>
               <Text className="mt-2 font-lemon-milk text-lg text-white">
                 {profile?.username ?? userEmail ?? "Loading..."}
               </Text>
