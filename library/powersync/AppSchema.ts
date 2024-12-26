@@ -136,9 +136,10 @@ export interface GratitudeItemRecord {
 export interface StreakPhotoRecord {
   id: string;
   challenge_days_id: string;
+  challenge_id: string;
+  photo_id: string;
   completed: boolean;
   description: string;
-  challenge_id: string;
   created_at: string;
   updated_at: string;
 }
@@ -289,9 +290,10 @@ export const AppSchema = new Schema([
     name: STREAK_PHOTO_TABLE,
     columns: [
       new Column({ name: "challenge_days_id", type: ColumnType.TEXT }),
-      new Column({ name: "completed", type: ColumnType.INTEGER }), // boolean is stored as INTEGER in SQLite
-      new Column({ name: "description", type: ColumnType.TEXT }),
       new Column({ name: "challenge_id", type: ColumnType.TEXT }),
+      new Column({ name: "photo_id", type: ColumnType.TEXT }),
+      new Column({ name: "completed", type: ColumnType.INTEGER }),
+      new Column({ name: "description", type: ColumnType.TEXT }),
       new Column({ name: "created_at", type: ColumnType.TEXT }),
       new Column({ name: "updated_at", type: ColumnType.TEXT }),
     ],

@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import React, { useMemo, useState } from "react";
 import { Text, View, ActionSheetIOS } from "react-native";
@@ -52,6 +53,7 @@ export const PhotoPickerWidget: React.FC<PhotoPickerWidgetProps> = ({
         return;
       }
 
+      // Pick the image
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,

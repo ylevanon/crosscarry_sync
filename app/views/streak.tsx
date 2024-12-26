@@ -1,6 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
+import { ATTACHMENT_TABLE, AttachmentRecord } from "@powersync/attachments";
+import { useQuery } from "@powersync/react-native";
+import { randomUUID } from "expo-crypto";
+import * as FileSystem from "expo-file-system";
 import React, { useState, useEffect } from "react";
-import { ScrollView, View, Pressable, Text } from "react-native";
+import { ScrollView, View, Pressable, Text, Image } from "react-native";
 import prompt from "react-native-prompt-android";
 
 import {
@@ -11,6 +15,7 @@ import {
   SERVICE_TABLE,
   GRATITUDE_ITEM_TABLE,
   STREAK_PHOTO_TABLE,
+  StreakPhotoRecord,
 } from "../../library/powersync/AppSchema";
 import { useSystem } from "../../library/powersync/system";
 import { colors } from "../../library/theme/colors";
@@ -54,6 +59,20 @@ const StreakView = () => {
   const { gratitudeEntry } = useGratitudeByChallengeDay(currentDay?.id);
   const { gratitudeItemEntries } = useGratitudeItemsByGratitudeId(gratitudeEntry?.id);
   const currentDayNumber = currentDay?.day_number;
+
+  // Query to get the streak photo
+  const { data: streakPhotos } = useQuery<StreakPhotoRecord>(
+    `SELECT * FROM ${STREAK_PHOTO_TABLE} WHERE challenge_days_id = ?`,
+    [currentDay?.id]
+  );
+  const streakPhoto = streakPhotos?.[0];
+
+  // Query to get the photo attachment
+  const { data: photoAttachments } = useQuery<AttachmentRecord>(
+    `SELECT * FROM ${ATTACHMENT_TABLE} WHERE id = ?`,
+    [streakPhoto?.photo_id]
+  );
+  const photoAttachment = photoAttachments?.[0];
 
   useEffect(() => {
     // Always reset states if entries don't exist
@@ -146,16 +165,31 @@ const StreakView = () => {
   };
 
   const handlePhotoSelected = async (base64: string) => {
-    if (!activeChallenge?.id || !currentDay?.id) return;
     try {
-      // Save photo to attachment queue
-      const { id: photoId } = await system.attachmentQueue!.savePhoto(base64);
+      console.log("Starting photo selection...");
+      if (!system.attachmentQueue || !currentDay || !activeChallenge) {
+        console.log("Missing required data:", {
+          hasAttachmentQueue: !!system.attachmentQueue,
+          hasCurrentDay: !!currentDay,
+          hasActiveChallenge: !!activeChallenge,
+        });
+        return;
+      }
 
+      // Save photo to attachment queue
+      console.log("Saving photo to attachment queue...");
+      const { id: photoId } = await system.attachmentQueue.savePhoto(base64);
+      console.log("Photo saved with ID:", photoId);
+
+      const streakPhotoId = randomUUID();
       // Create streak photo entry
+      console.log("Creating streak photo entry...");
       await system.powersync.execute(
-        `INSERT INTO ${STREAK_PHOTO_TABLE} (challenge_days_id, challenge_id, photo_id,) VALUES (?, ?, ?)`,
-        [currentDay.id, activeChallenge.id, photoId]
+        `INSERT INTO ${STREAK_PHOTO_TABLE} (id, challenge_days_id, challenge_id, photo_id, completed, description, created_at, updated_at) 
+         VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+        [streakPhotoId, currentDay.id, activeChallenge.id, photoId, 1, ""]
       );
+      console.log("Streak photo entry created with ID:", streakPhotoId);
     } catch (error) {
       console.error("Error saving streak photo:", error);
     }
@@ -179,102 +213,108 @@ const StreakView = () => {
             totalTasks={totalTasks}
           />
 
-          <View className="mt-6">
-            <PhotoPickerWidget
-              title="Add Photo"
-              subtitle="Document your progress"
-              onPhotoSelected={handlePhotoSelected}
-            />
+          {/* Photo Section */}
+          <View className="mb-4">
+            {photoAttachment?.local_uri ? (
+              <Image
+                source={{ uri: FileSystem.documentDirectory + photoAttachment.local_uri }}
+                className="h-40 w-full rounded-lg object-cover"
+              />
+            ) : (
+              <PhotoPickerWidget
+                title="Add Photo"
+                subtitle="Document your progress"
+                onPhotoSelected={handlePhotoSelected}
+              />
+            )}
+          </View>
 
-            <CheckboxWidget
-              title="No Alcohol, Drugs, or Pornography"
-              subtitle="Stay clean and sober"
-              onPress={toggleSobriety}
-              defaultChecked={sober}
-            />
+          <CheckboxWidget
+            title="No Alcohol, Drugs, or Pornography"
+            subtitle="Stay clean and sober"
+            onPress={toggleSobriety}
+            defaultChecked={sober}
+          />
 
-            <CheckboxWidget
-              title="Diet"
-              subtitle="Stick to your nutrition plan"
-              onPress={toggleDiet}
-              defaultChecked={diet}
-            />
+          <CheckboxWidget
+            title="Diet"
+            subtitle="Stick to your nutrition plan"
+            onPress={toggleDiet}
+            defaultChecked={diet}
+          />
 
-            <CardInputWidget
-              title="Complete Workout"
-              subtitle="What exercise did you do?"
-              placeholder="Describe your workout..."
-              value={workout}
-              onChangeText={updateWorkoutDescription}
-            />
+          <CardInputWidget
+            title="Complete Workout"
+            subtitle="What exercise did you do?"
+            placeholder="Describe your workout..."
+            value={workout}
+            onChangeText={updateWorkoutDescription}
+          />
 
-            <CardInputWidget
-              title="Ask for Help"
-              subtitle="What did you need help with?"
-              placeholder="What did you ask for..."
-              value={help}
-              onChangeText={updateHelpDescription}
-            />
+          <CardInputWidget
+            title="Ask for Help"
+            subtitle="What did you need help with?"
+            placeholder="What did you ask for..."
+            value={help}
+            onChangeText={updateHelpDescription}
+          />
 
-            <CardInputWidget
-              title="Perform an Act of Service"
-              subtitle="How did you help others today?"
-              placeholder="Describe your service..."
-              value={service}
-              onChangeText={updateServiceDescription}
-            />
+          <CardInputWidget
+            title="Perform an Act of Service"
+            subtitle="How did you help others today?"
+            placeholder="Describe your service..."
+            value={service}
+            onChangeText={updateServiceDescription}
+          />
 
-            <View className="mx-4 mt-6">
-              <View
-                className="rounded-xl p-4"
-                style={{
-                  backgroundColor:
-                    gratitudeItems.length > 0 ? colors.achievement.gold : colors.neutral[700],
-                }}
-              >
-                <View className="flex-row items-center justify-between">
-                  <View className="flex-1">
-                    <Text
-                      className="mb-1 font-['LemonMilkMedium'] text-xl"
-                      style={{
-                        color:
-                          gratitudeItems.length > 0 ? colors.neutral[900] : colors.neutral[100],
-                      }}
-                    >
-                      Gratitude
-                    </Text>
-                    <Text
-                      style={{
-                        color:
-                          gratitudeItems.length > 0 ? colors.neutral[900] : colors.neutral[400],
-                      }}
-                    >
-                      What are you grateful for today?
-                    </Text>
-                  </View>
-                  <Pressable
-                    onPress={() => {
-                      prompt(
-                        "Gratitude",
-                        "What are you grateful for?",
-                        (text) => {
-                          if (text && text.trim()) {
-                            addGratitudeItem(text.trim());
-                          }
-                        },
-                        {
-                          type: "plain-text",
-                        }
-                      );
+          <View className="mx-4 mt-6">
+            <View
+              className="rounded-xl p-4"
+              style={{
+                backgroundColor:
+                  gratitudeItems.length > 0 ? colors.achievement.gold : colors.neutral[700],
+              }}
+            >
+              <View className="flex-row items-center justify-between">
+                <View className="flex-1">
+                  <Text
+                    className="mb-1 font-['LemonMilkMedium'] text-xl"
+                    style={{
+                      color: gratitudeItems.length > 0 ? colors.neutral[900] : colors.neutral[100],
                     }}
                   >
-                    <Ionicons
-                      name="add-circle"
-                      size={24}
-                      color={gratitudeItems.length > 0 ? colors.neutral[900] : colors.neutral[400]}
-                    />
-                  </Pressable>
+                    Gratitude
+                  </Text>
+                  <Text
+                    style={{
+                      color: gratitudeItems.length > 0 ? colors.neutral[900] : colors.neutral[400],
+                    }}
+                  >
+                    What are you grateful for today?
+                  </Text>
                 </View>
+                <Pressable
+                  onPress={() => {
+                    prompt(
+                      "Gratitude",
+                      "What are you grateful for?",
+                      (text) => {
+                        if (text && text.trim()) {
+                          addGratitudeItem(text.trim());
+                        }
+                      },
+                      {
+                        type: "plain-text",
+                      }
+                    );
+                  }}
+                >
+                  <Ionicons
+                    name="add-circle"
+                    size={24}
+                    color={gratitudeItems.length > 0 ? colors.neutral[900] : colors.neutral[400]}
+                  />
+                </Pressable>
               </View>
             </View>
           </View>

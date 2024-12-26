@@ -2,7 +2,7 @@ import { AbstractAttachmentQueue, AttachmentRecord, AttachmentState } from "@pow
 import { randomUUID } from "expo-crypto";
 import * as FileSystem from "expo-file-system";
 
-import { PROFILE_TABLE } from "./AppSchema";
+import { PROFILE_TABLE, STREAK_PHOTO_TABLE } from "./AppSchema";
 import { AppConfig } from "../supabase/AppConfig";
 
 export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
@@ -19,7 +19,11 @@ export class PhotoAttachmentQueue extends AbstractAttachmentQueue {
 
   onAttachmentIdsChange(onUpdate: (ids: string[]) => void): void {
     this.powersync.watch(
-      `SELECT photo_id as id FROM ${PROFILE_TABLE} WHERE photo_id IS NOT NULL`,
+      `
+      SELECT photo_id as id FROM ${PROFILE_TABLE} WHERE photo_id IS NOT NULL
+      UNION
+      SELECT photo_id as id FROM ${STREAK_PHOTO_TABLE} WHERE photo_id IS NOT NULL
+      `,
       [],
       {
         onResult: (result) => onUpdate(result.rows?._array.map((r) => r.id) ?? []),
