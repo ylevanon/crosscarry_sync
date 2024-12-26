@@ -175,13 +175,27 @@ const StreakView = () => {
       // Save photo to attachment queue
       const { id: photoId } = await system.attachmentQueue.savePhoto(base64);
 
-      // Update streak photo record
-      await system.powersync.execute(
-        `INSERT INTO ${STREAK_PHOTO_TABLE} (id, challenge_days_id, challenge_id, photo_id, completed, description, created_at, updated_at) 
-         VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-        [streakPhotoId, currentDay.id, activeChallenge.id, photoId, 1, ""]
+      // Check if streak photo record exists
+      const { data: existingPhotos } = await system.powersync.execute<StreakPhotoRecord>(
+        `SELECT * FROM ${STREAK_PHOTO_TABLE} WHERE challenge_id = ? AND challenge_days_id = ?`,
+        [activeChallenge.id, currentDay.id]
       );
-      console.log("Streak photo entry created with ID:", streakPhotoId);
+      const existingPhoto = existingPhotos?.[0];
+
+      if (existingPhoto) {
+        // Update existing record
+        await system.powersync.execute(
+          `UPDATE ${STREAK_PHOTO_TABLE} SET photo_id = ?, updated_at = datetime('now') WHERE id = ?`,
+          [photoId, existingPhoto.id]
+        );
+      } else {
+        // Create new record
+        await system.powersync.execute(
+          `INSERT INTO ${STREAK_PHOTO_TABLE} (id, challenge_days_id, challenge_id, photo_id, completed, description, created_at, updated_at) 
+           VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+          [randomUUID(), currentDay.id, activeChallenge.id, photoId, 1, ""]
+        );
+      }
     } catch (error) {
       console.error("Error saving streak photo:", error);
     }
@@ -209,18 +223,49 @@ const StreakView = () => {
           {/* Photo Section */}
           <View className="mx-4 mt-6">
             {photoAttachment?.local_uri ? (
-              <View className="rounded-lg bg-neutral-800">
-                <Image
-                  source={{ uri: FileSystem.documentDirectory + photoAttachment.local_uri }}
-                  className="w-full rounded-lg object-cover"
-                  style={{ height: 200 }}
-                />
-              </View>
+              <ImageWidget
+                imageUri={photoAttachment.local_uri}
+                onUpdatePhoto={async (base64) => {
+                  if (!system.attachmentQueue || !currentDay?.id || !activeChallenge?.id) return;
+
+                  try {
+                    // Save new photo to attachment queue
+                    const { id: photoId } = await system.attachmentQueue.savePhoto(base64);
+
+                    // Update existing streak photo record
+                    await system.powersync.execute(
+                      `UPDATE ${STREAK_PHOTO_TABLE} SET photo_id = ?, updated_at = datetime('now') 
+                       WHERE challenge_id = ? AND challenge_days_id = ?`,
+                      [photoId, activeChallenge.id, currentDay.id]
+                    );
+                  } catch (error) {
+                    console.error("Error updating streak photo:", error);
+                  }
+                }}
+                disabled={!canUploadPhoto}
+              />
             ) : (
               <PhotoPickerWidget
                 title={canUploadPhoto ? "Add Photo" : "Loading..."}
                 subtitle={canUploadPhoto ? "Document your progress" : "Please wait"}
-                onPhotoSelected={handlePhotoSelected}
+                onPhotoSelected={async (base64) => {
+                  if (!system.attachmentQueue || !currentDay?.id || !activeChallenge?.id) return;
+
+                  try {
+                    // Save photo to attachment queue
+                    const { id: photoId } = await system.attachmentQueue.savePhoto(base64);
+
+                    // Create new streak photo record
+                    await system.powersync.execute(
+                      `INSERT INTO ${STREAK_PHOTO_TABLE} 
+                       (id, challenge_days_id, challenge_id, photo_id, completed, description, created_at, updated_at) 
+                       VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+                      [randomUUID(), currentDay.id, activeChallenge.id, photoId, 1, ""]
+                    );
+                  } catch (error) {
+                    console.error("Error saving new streak photo:", error);
+                  }
+                }}
                 disabled={!canUploadPhoto}
               />
             )}
