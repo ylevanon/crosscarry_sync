@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import React, { useMemo, useState } from "react";
-import { Text, View, ActionSheetIOS } from "react-native";
+import { Text, View, ActionSheetIOS, Pressable } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   useAnimatedStyle,
@@ -12,24 +12,27 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { CameraWidget } from "./CameraWidget";
-import { colors } from "../theme/colors";
 
 interface PhotoPickerWidgetProps {
-  title: string;
+  title?: string;
   subtitle?: string;
-  onPhotoSelected: (base64: string) => Promise<void>;
+  onPhotoSelected: (base64: string) => void;
+  disabled?: boolean;
 }
 
-export const PhotoPickerWidget: React.FC<PhotoPickerWidgetProps> = ({
-  title,
-  subtitle,
+export const PhotoPickerWidget = ({
+  title = "Add Photo",
+  subtitle = "Upload a photo",
   onPhotoSelected,
-}) => {
+  disabled = false,
+}: PhotoPickerWidgetProps) => {
   const [showCamera, setShowCamera] = useState(false);
   const pressed = useSharedValue(false);
   const scale = useSharedValue(1);
 
   const handlePhotoPress = () => {
+    if (disabled) return;
+
     ActionSheetIOS.showActionSheetWithOptions(
       {
         options: ["Cancel", "Take Photo", "Choose from Library"],
@@ -46,6 +49,8 @@ export const PhotoPickerWidget: React.FC<PhotoPickerWidgetProps> = ({
   };
 
   const pickImage = async () => {
+    if (disabled) return;
+
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
@@ -53,7 +58,6 @@ export const PhotoPickerWidget: React.FC<PhotoPickerWidgetProps> = ({
         return;
       }
 
-      // Pick the image
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
@@ -109,23 +113,19 @@ export const PhotoPickerWidget: React.FC<PhotoPickerWidgetProps> = ({
     <View className="mx-4 mt-6">
       <GestureDetector gesture={tap}>
         <Animated.View style={animatedStyle}>
-          <View
-            className="flex-row items-center justify-between rounded-xl p-4"
-            style={{
-              backgroundColor: colors.neutral[700],
-            }}
+          <Pressable
+            className={`rounded-lg bg-neutral-800 p-4 ${disabled ? "opacity-50" : ""}`}
+            onPress={handlePhotoPress}
+            disabled={disabled}
           >
-            <View className="flex-row items-center">
-              <View className="mr-3 h-8 w-8 items-center justify-center rounded-full bg-neutral-800">
-                <Ionicons name="camera" size={18} color="#DC1E1E" />
+            <View className="flex-row items-center justify-between">
+              <View className="flex-1">
+                <Text className="mb-1 font-['LemonMilkMedium'] text-xl text-white">{title}</Text>
+                <Text className="text-neutral-400">{subtitle}</Text>
               </View>
-              <View>
-                <Text className="text-base text-white">{title}</Text>
-                {subtitle && <Text className="text-sm text-gray-400">{subtitle}</Text>}
-              </View>
+              <Ionicons name="camera" size={24} color={disabled ? "#666" : "#DC1E1E"} />
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#6B7280" />
-          </View>
+          </Pressable>
         </Animated.View>
       </GestureDetector>
     </View>

@@ -3,8 +3,8 @@ import { ATTACHMENT_TABLE, AttachmentRecord } from "@powersync/attachments";
 import { useQuery } from "@powersync/react-native";
 import { randomUUID } from "expo-crypto";
 import * as FileSystem from "expo-file-system";
-import React, { useState, useEffect } from "react";
-import { ScrollView, View, Pressable, Text, Image } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { ScrollView, View, Pressable, Text, Image, ActionSheetIOS } from "react-native";
 import prompt from "react-native-prompt-android";
 
 import {
@@ -33,6 +33,7 @@ import useSoberByChallengeDay from "~/library/powersync/repositories/sober";
 import useWorkoutByChallengeDay from "~/library/powersync/repositories/workout";
 import { CardInputWidget } from "~/library/widgets/CardInputWidget";
 import { CheckboxWidget } from "~/library/widgets/CheckboxWidget";
+import { ImageWidget } from "~/library/widgets/ImageWidget";
 import { ListItemWidget } from "~/library/widgets/ListItemWidget";
 import { PhotoPickerWidget } from "~/library/widgets/PhotoPickerWidget";
 
@@ -81,15 +82,18 @@ const StreakView = () => {
     setWorkout(workoutEntry?.description || "");
     setHelp(helpEntry?.description || "");
     setService(serviceEntry?.description || "");
-    setGratitudeItems(gratitudeItemEntries);
+    setGratitudeItems(gratitudeItemEntries || []);
   }, [
-    soberEntry?.id,
-    dietEntry?.id,
-    workoutEntry?.id,
-    helpEntry?.id,
-    serviceEntry?.id,
+    soberEntry?.completed,
+    dietEntry?.completed,
+    workoutEntry?.description,
+    helpEntry?.description,
+    serviceEntry?.description,
     gratitudeItemEntries,
   ]);
+
+  // Ensure we have required data before allowing photo upload
+  const canUploadPhoto = !!system.attachmentQueue && !!currentDay && !!activeChallenge;
 
   const toggleSobriety = async () => {
     if (!soberEntry?.id) return;
@@ -165,25 +169,13 @@ const StreakView = () => {
   };
 
   const handlePhotoSelected = async (base64: string) => {
+    if (!system.attachmentQueue || !currentDay?.id || !activeChallenge?.id) return;
+
     try {
-      console.log("Starting photo selection...");
-      if (!system.attachmentQueue || !currentDay || !activeChallenge) {
-        console.log("Missing required data:", {
-          hasAttachmentQueue: !!system.attachmentQueue,
-          hasCurrentDay: !!currentDay,
-          hasActiveChallenge: !!activeChallenge,
-        });
-        return;
-      }
-
       // Save photo to attachment queue
-      console.log("Saving photo to attachment queue...");
       const { id: photoId } = await system.attachmentQueue.savePhoto(base64);
-      console.log("Photo saved with ID:", photoId);
 
-      const streakPhotoId = randomUUID();
-      // Create streak photo entry
-      console.log("Creating streak photo entry...");
+      // Update streak photo record
       await system.powersync.execute(
         `INSERT INTO ${STREAK_PHOTO_TABLE} (id, challenge_days_id, challenge_id, photo_id, completed, description, created_at, updated_at) 
          VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
@@ -202,6 +194,7 @@ const StreakView = () => {
   const completedChecks = Number(sober) + Number(diet) + Number(workout);
   // const completedTasks = completedChecks + completedInputs;
   const progress = totalTasks > 0 ? completedChecks / totalTasks : 0;
+
   return (
     <View className="flex-1 bg-neutral-900">
       <ScrollView className="flex-1 bg-neutral-800 pt-4">
@@ -214,17 +207,21 @@ const StreakView = () => {
           />
 
           {/* Photo Section */}
-          <View className="mb-4">
+          <View className="mx-4 mt-6">
             {photoAttachment?.local_uri ? (
-              <Image
-                source={{ uri: FileSystem.documentDirectory + photoAttachment.local_uri }}
-                className="h-40 w-full rounded-lg object-cover"
-              />
+              <View className="rounded-lg bg-neutral-800">
+                <Image
+                  source={{ uri: FileSystem.documentDirectory + photoAttachment.local_uri }}
+                  className="w-full rounded-lg object-cover"
+                  style={{ height: 200 }}
+                />
+              </View>
             ) : (
               <PhotoPickerWidget
-                title="Add Photo"
-                subtitle="Document your progress"
+                title={canUploadPhoto ? "Add Photo" : "Loading..."}
+                subtitle={canUploadPhoto ? "Document your progress" : "Please wait"}
                 onPhotoSelected={handlePhotoSelected}
+                disabled={!canUploadPhoto}
               />
             )}
           </View>
