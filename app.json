@@ -71,7 +71,12 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ylevanon.crosscarry"
+      "bundleIdentifier": "com.ylevanon.crosscarry",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Allow CrossCarry to access your photos for uploading profile pictures and documenting your progress.",
+        "NSPhotoLibraryAddUsageDescription": "Allow CrossCarry to save photos.",
+        "NSCameraUsageDescription": "Allow CrossCarry to access your camera for taking photos."
+      }
     },
     "android": {
       "adaptiveIcon": {
