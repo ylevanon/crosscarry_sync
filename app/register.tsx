@@ -53,7 +53,7 @@ export default function Register() {
             />
           </View>
 
-          {error ? <Text className="text-primary font-sans">{error}</Text> : null}
+          {error ? <Text className="font-sans text-primary">{error}</Text> : null}
 
           <View className="space-y-3">
             <AnimatedButton
@@ -81,7 +81,7 @@ export default function Register() {
                   setLoading(false);
                 }
               }}
-              className="bg-primary rounded-lg px-4 py-3"
+              className="rounded-lg bg-primary px-4 py-3"
             >
               <Text className="text-center font-lemon-milk text-lg text-white">Sign Up</Text>
             </AnimatedButton>
