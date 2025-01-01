@@ -1,4 +1,4 @@
-package com.powersync.example
+package com.ylevanon.crosscarry
 
 import android.os.Build
 import android.os.Bundle

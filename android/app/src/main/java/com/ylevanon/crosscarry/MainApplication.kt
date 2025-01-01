@@ -1,4 +1,4 @@
-package com.powersync.example
+package com.ylevanon.crosscarry
 
 import android.app.Application
 import android.content.res.Configuration
