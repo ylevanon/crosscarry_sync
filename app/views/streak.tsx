@@ -2,9 +2,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { ATTACHMENT_TABLE, AttachmentRecord } from "@powersync/attachments";
 import { useQuery } from "@powersync/react-native";
 import { randomUUID } from "expo-crypto";
-import * as FileSystem from "expo-file-system";
-import React, { useState, useEffect, useRef } from "react";
-import { ScrollView, View, Pressable, Text, Image, ActionSheetIOS } from "react-native";
+import React, { useState, useEffect } from "react";
+import { ScrollView, View, Pressable, Text } from "react-native";
 import prompt from "react-native-prompt-android";
 
 import {
@@ -96,6 +95,8 @@ const StreakView = () => {
   const canUploadPhoto = !!system.attachmentQueue && !!currentDay && !!activeChallenge;
 
   const toggleSobriety = async () => {
+    console.log("Toggling sober status");
+    console.log("soberEntry", soberEntry);
     if (!soberEntry?.id) return;
     const newStatus = !sober;
     await system.powersync.execute(

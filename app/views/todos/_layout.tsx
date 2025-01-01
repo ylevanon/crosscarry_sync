@@ -16,7 +16,7 @@ const TodosLayout = () => {
           title: "Todo Lists",
         }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="edit/[id]"
         options={({ route }) => ({
           title: "Edit List",
@@ -26,7 +26,7 @@ const TodosLayout = () => {
           //   fontSize: 20, // Example override
           // },
         })}
-      />
+      /> */}
     </Stack>
   );
 };

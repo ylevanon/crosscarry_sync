@@ -25,19 +25,22 @@ export default function UsernameScreen() {
         [username, userID]
       );
 
-      router.push("/views/onboarding/get-started");
+      router.navigate("/views/onboarding/get-started");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleSkip = () => {
-    router.push("/views/onboarding/get-started");
+    router.navigate("/views/onboarding/get-started");
   };
 
   return (
-    <View className="flex-1 items-center justify-center px-8">
-      <Animated.View entering={FadeIn.duration(1000)} className="w-full items-center space-y-8">
+    <Animated.View
+      entering={FadeIn.duration(400)}
+      className="flex-1 items-center justify-center px-8"
+    >
+      <View className="w-full items-center space-y-8">
         <Image
           source={require("../../../assets/pngs/FOLLOW40-Logos-08.png")}
           className="mb-8 h-60 w-60"
@@ -45,7 +48,7 @@ export default function UsernameScreen() {
         />
 
         <View className="items-center space-y-4">
-          <Text className="font-lemon-milk-bold text-center text-3xl text-white">
+          <Text className="text-center font-lemon-milk-bold text-3xl text-white">
             What should we call you?
           </Text>
           <Text className="font-inter text-center text-neutral-400">
@@ -54,33 +57,32 @@ export default function UsernameScreen() {
         </View>
 
         <TextInput
-          value={username}
-          onChangeText={setUsername}
+          className="font-inter h-12 w-full rounded-lg bg-neutral-800 px-4 text-white"
           placeholder="Enter username"
           placeholderTextColor="#666"
-          className="font-inter w-full rounded-lg bg-neutral-800 px-4 py-3 text-white"
+          value={username}
+          onChangeText={setUsername}
           autoCapitalize="none"
           autoCorrect={false}
         />
-      </Animated.View>
+      </View>
 
       <View className="absolute bottom-12 w-full space-y-4">
         <AnimatedButton
           onPress={handleSubmit}
           disabled={!username.trim() || isSubmitting}
-          className="bg-primary items-center justify-center rounded-lg py-3"
+          className="items-center justify-center rounded-lg bg-primary py-3"
         >
           <Text className="font-inter-semi text-white">Continue</Text>
         </AnimatedButton>
 
         <AnimatedButton
           onPress={handleSkip}
-          disabled={isSubmitting}
-          className="items-center justify-center rounded-lg bg-neutral-800 py-3"
+          className="items-center justify-center rounded-lg py-3"
         >
-          <Text className="font-inter-semi text-white">Skip for now</Text>
+          <Text className="font-inter-semi text-neutral-400">Skip for now</Text>
         </AnimatedButton>
       </View>
-    </View>
+    </Animated.View>
   );
 }
